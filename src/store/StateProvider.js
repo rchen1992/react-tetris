@@ -4,8 +4,9 @@ import defaultState from './defaultState';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
+    const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
 
-    const state = React.useMemo(() => ({ grid }), [grid]);
+    const state = React.useMemo(() => ({ grid, currentBlock }), [grid, currentBlock]);
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;
 }
