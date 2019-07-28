@@ -9,25 +9,62 @@ function StateProvider(props) {
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
 
     function rotateCurrentBlock() {
-        const { properties, positionCoordinates } = currentBlock;
+        setCurrentBlock(prevBlock => ({
+            ...prevBlock,
+            properties: rotateBlock(prevBlock.properties),
+        }));
+    }
 
+    function moveCurrentBlockLeft() {
         setCurrentBlock(prevBlock => {
-            const rotatedBlock = rotateBlock(properties);
+            const [row, col] = prevBlock.positionCoordinates;
             return {
                 ...prevBlock,
-                properties: rotatedBlock,
-                cellCoordinateMap: getCurrentBlockCellCoordinateMap(
-                    rotatedBlock,
-                    positionCoordinates
-                ),
+                positionCoordinates: [row, col - 1],
             };
         });
     }
 
-    const state = React.useMemo(() => ({ grid, currentBlock, rotateCurrentBlock }), [
-        grid,
-        currentBlock,
-    ]);
+    function moveCurrentBlockRight() {
+        setCurrentBlock(prevBlock => {
+            const [row, col] = prevBlock.positionCoordinates;
+            return {
+                ...prevBlock,
+                positionCoordinates: [row, col + 1],
+            };
+        });
+    }
+
+    function moveCurrentBlockDown() {
+        setCurrentBlock(prevBlock => {
+            const [row, col] = prevBlock.positionCoordinates;
+            return {
+                ...prevBlock,
+                positionCoordinates: [row + 1, col],
+            };
+        });
+    }
+
+    /**
+     * Compute cell coordinate map for current block.
+     */
+    const currentBlockCellCoordinateMap = getCurrentBlockCellCoordinateMap(
+        currentBlock.properties,
+        currentBlock.positionCoordinates
+    );
+
+    const state = React.useMemo(
+        () => ({
+            grid,
+            currentBlock,
+            currentBlockCellCoordinateMap,
+            rotateCurrentBlock,
+            moveCurrentBlockLeft,
+            moveCurrentBlockRight,
+            moveCurrentBlockDown,
+        }),
+        [grid, currentBlock, currentBlockCellCoordinateMap]
+    );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;
 }

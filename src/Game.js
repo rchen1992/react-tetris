@@ -20,16 +20,24 @@ const Cell = styled.span`
 `;
 
 function Game() {
-    const { grid, currentBlock, rotateCurrentBlock } = useStore();
-    const { properties, positionCoordinates, cellCoordinateMap } = currentBlock;
+    const {
+        grid,
+        currentBlock,
+        currentBlockCellCoordinateMap,
+        rotateCurrentBlock,
+        moveCurrentBlockLeft,
+        moveCurrentBlockRight,
+        moveCurrentBlockDown,
+    } = useStore();
 
     useKeyboardListeners({
-        ArrowUp: () => {
-            rotateCurrentBlock();
-        },
+        ArrowUp: () => rotateCurrentBlock(),
+        ArrowLeft: () => moveCurrentBlockLeft(),
+        ArrowRight: () => moveCurrentBlockRight(),
+        ArrowDown: () => moveCurrentBlockDown(),
     });
 
-    console.log(cellCoordinateMap.entries());
+    console.log(currentBlockCellCoordinateMap.entries());
     console.log(currentBlock);
 
     let cells = [];
@@ -40,7 +48,7 @@ function Game() {
                     key={`${i}${j}`}
                     row={i}
                     col={j}
-                    isCurrentBlockCell={cellCoordinateMap.has([i, j])}
+                    isCurrentBlockCell={currentBlockCellCoordinateMap.has([i, j])}
                 />
             );
         }

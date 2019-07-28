@@ -8,7 +8,7 @@ function createGrid(height, width) {
     return Array(height).fill(Array(width).fill(null));
 }
 
-const startingBlockCoordinates = [0, 0];
+const startingBlockCoordinates = [0, 3];
 const startingBlock = blocks[BLOCK_TYPES.T];
 
 export default {
@@ -16,9 +16,9 @@ export default {
     currentBlock: {
         properties: startingBlock,
         positionCoordinates: startingBlockCoordinates,
-        cellCoordinateMap: getCurrentBlockCellCoordinateMap(
-            startingBlock,
-            startingBlockCoordinates
-        ),
     },
+    currentBlockCellCoordinateMap: getCurrentBlockCellCoordinateMap(
+        startingBlock,
+        startingBlockCoordinates
+    ),
 };
