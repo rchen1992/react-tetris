@@ -11,13 +11,18 @@ function StateProvider(props) {
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
 
     function rotateCurrentBlock() {
-        setCurrentBlock(prevBlock => ({
-            ...prevBlock,
-            properties: {
-                ...prevBlock.properties,
-                shape: rotateBlock(prevBlock.properties.shape),
-            },
-        }));
+        const { positionCoordinates, properties } = currentBlock;
+        const rotatedBlockShape = rotateBlock(properties.shape);
+
+        if (isWithinGridBounds(grid, positionCoordinates, rotatedBlockShape)) {
+            setCurrentBlock(prevBlock => ({
+                ...prevBlock,
+                properties: {
+                    ...prevBlock.properties,
+                    shape: rotatedBlockShape,
+                },
+            }));
+        }
     }
 
     function moveCurrentBlock(direction) {
