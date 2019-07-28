@@ -5,17 +5,18 @@ import { createGrid } from 'grid';
 export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 20;
 
-const startingBlockCoordinates = [0, 3];
+export const STARTING_BLOCK_COORDINATES = [0, 3];
+
 const startingBlock = blocks[BLOCK_TYPES.T];
 
 export default {
     grid: createGrid(GRID_HEIGHT, GRID_WIDTH),
     currentBlock: {
         properties: startingBlock,
-        positionCoordinates: startingBlockCoordinates,
+        positionCoordinates: STARTING_BLOCK_COORDINATES,
     },
     currentBlockCellCoordinateMap: getCurrentBlockCellCoordinateMap(
         startingBlock.shape,
-        startingBlockCoordinates
+        STARTING_BLOCK_COORDINATES
     ),
 };

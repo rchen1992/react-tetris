@@ -1,14 +1,15 @@
 import React from 'react';
 import StateContext from './StateContext';
-import defaultState from './defaultState';
+import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
 import rotateBlock from 'blocks/rotation';
-import { MOVEMENT_DIRECTIONS } from 'blocks';
+import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getCurrentBlockCellCoordinateMap from 'blocks/cellCoordinateMap';
-import { isWithinGridBounds } from 'grid';
+import { isWithinGridBounds, cloneGrid } from 'grid';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
+    const currentBlockCellCoordinateMap = React.useRef(null);
 
     function rotateCurrentBlock() {
         const { positionCoordinates, properties } = currentBlock;
@@ -49,13 +50,40 @@ function StateProvider(props) {
                 ...prevBlock,
                 positionCoordinates: newCoords,
             }));
+        } else {
+            if (direction === MOVEMENT_DIRECTIONS.DOWN) {
+                commitCurrentBlock();
+            }
         }
+    }
+
+    function commitCurrentBlock() {
+        /**
+         * Get the list of coordinates for the current block
+         * and then update the grid with those values.
+         */
+        const coords = currentBlockCellCoordinateMap.current.keysArray();
+        const newGrid = cloneGrid(grid);
+        coords.forEach(coord => {
+            const [row, col] = coord;
+            newGrid[row][col] = currentBlock.properties.type;
+        });
+
+        setGrid(newGrid);
+
+        /**
+         * Generate new current block.
+         */
+        setCurrentBlock({
+            properties: getRandomNewBlock(),
+            positionCoordinates: STARTING_BLOCK_COORDINATES,
+        });
     }
 
     /**
      * Compute cell coordinate map for current block.
      */
-    const currentBlockCellCoordinateMap = getCurrentBlockCellCoordinateMap(
+    currentBlockCellCoordinateMap.current = getCurrentBlockCellCoordinateMap(
         currentBlock.properties.shape,
         currentBlock.positionCoordinates
     );
@@ -64,7 +92,7 @@ function StateProvider(props) {
         () => ({
             grid,
             currentBlock,
-            currentBlockCellCoordinateMap,
+            currentBlockCellCoordinateMap: currentBlockCellCoordinateMap.current,
             rotateCurrentBlock,
             moveCurrentBlock,
         }),

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks';
+import { BLOCK_TYPES } from 'blocks';
 
 const Grid = styled.div`
     display: grid;
@@ -17,7 +18,24 @@ const Grid = styled.div`
 
 const Cell = styled.span`
     border: 1px solid black;
-    background-color: ${props => (props.isCurrentBlockCell ? 'blue' : 'none')};
+    background-color: ${props => {
+        if (props.isCurrentBlockCell) {
+            return 'blue';
+        }
+
+        switch (props.blockType) {
+            case BLOCK_TYPES.I:
+            case BLOCK_TYPES.L:
+            case BLOCK_TYPES.J:
+            case BLOCK_TYPES.Z:
+            case BLOCK_TYPES.S:
+            case BLOCK_TYPES.O:
+            case BLOCK_TYPES.T:
+                return 'blue';
+        }
+
+        return 'none';
+    }};
 `;
 
 function Game() {
@@ -36,7 +54,7 @@ function Game() {
         ArrowDown: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN),
     });
 
-    console.log(currentBlockCellCoordinateMap.entries());
+    console.log(currentBlockCellCoordinateMap.keysArray());
     console.log(currentBlock);
 
     let cells = [];
@@ -47,6 +65,7 @@ function Game() {
                     key={`${i}${j}`}
                     row={i}
                     col={j}
+                    blockType={grid[i][j]}
                     isCurrentBlockCell={currentBlockCellCoordinateMap.has([i, j])}
                 />
             );

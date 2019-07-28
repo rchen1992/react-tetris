@@ -3,6 +3,16 @@ export function createGrid(height, width) {
 }
 
 /**
+ * Deep clone of a grid/matrix.
+ * @param {array} grid - matrix
+ */
+export function cloneGrid(grid) {
+    return grid.map(row => {
+        return row.slice();
+    });
+}
+
+/**
  * Returns true if coordinates are within grid bounds.
  *
  * @param {array} grid
