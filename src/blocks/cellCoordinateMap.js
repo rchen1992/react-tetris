@@ -1,7 +1,7 @@
 /**
  * Proxy handler for proxying a Set.
  * Transforms coordinate tuple values to strings when
- * adding/retrieving from the Set.
+ * adding/deleting/checking the Set.
  *
  * Example) [1,2] => '1,2'
  */
