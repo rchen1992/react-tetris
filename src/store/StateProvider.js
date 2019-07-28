@@ -2,7 +2,9 @@ import React from 'react';
 import StateContext from './StateContext';
 import defaultState from './defaultState';
 import rotateBlock from 'blocks/rotation';
+import { MOVEMENT_DIRECTIONS } from 'blocks';
 import getCurrentBlockCellCoordinateMap from 'blocks/cellCoordinateMap';
+import { isWithinGridBounds } from 'grid';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
@@ -11,45 +13,45 @@ function StateProvider(props) {
     function rotateCurrentBlock() {
         setCurrentBlock(prevBlock => ({
             ...prevBlock,
-            properties: rotateBlock(prevBlock.properties),
+            properties: {
+                ...prevBlock.properties,
+                shape: rotateBlock(prevBlock.properties.shape),
+            },
         }));
     }
 
-    function moveCurrentBlockLeft() {
-        setCurrentBlock(prevBlock => {
-            const [row, col] = prevBlock.positionCoordinates;
-            return {
-                ...prevBlock,
-                positionCoordinates: [row, col - 1],
-            };
-        });
-    }
+    function moveCurrentBlock(direction) {
+        const [row, col] = currentBlock.positionCoordinates;
 
-    function moveCurrentBlockRight() {
-        setCurrentBlock(prevBlock => {
-            const [row, col] = prevBlock.positionCoordinates;
-            return {
-                ...prevBlock,
-                positionCoordinates: [row, col + 1],
-            };
-        });
-    }
+        let newCoords;
+        switch (direction) {
+            case MOVEMENT_DIRECTIONS.LEFT:
+                newCoords = [row, col - 1];
+                break;
+            case MOVEMENT_DIRECTIONS.RIGHT:
+                newCoords = [row, col + 1];
+                break;
+            case MOVEMENT_DIRECTIONS.DOWN:
+                newCoords = [row + 1, col];
+                break;
+            default:
+                // No movement
+                newCoords = [row, col];
+        }
 
-    function moveCurrentBlockDown() {
-        setCurrentBlock(prevBlock => {
-            const [row, col] = prevBlock.positionCoordinates;
-            return {
+        if (isWithinGridBounds(grid, newCoords, currentBlock.properties.shape)) {
+            setCurrentBlock(prevBlock => ({
                 ...prevBlock,
-                positionCoordinates: [row + 1, col],
-            };
-        });
+                positionCoordinates: newCoords,
+            }));
+        }
     }
 
     /**
      * Compute cell coordinate map for current block.
      */
     const currentBlockCellCoordinateMap = getCurrentBlockCellCoordinateMap(
-        currentBlock.properties,
+        currentBlock.properties.shape,
         currentBlock.positionCoordinates
     );
 
@@ -59,9 +61,7 @@ function StateProvider(props) {
             currentBlock,
             currentBlockCellCoordinateMap,
             rotateCurrentBlock,
-            moveCurrentBlockLeft,
-            moveCurrentBlockRight,
-            moveCurrentBlockDown,
+            moveCurrentBlock,
         }),
         [grid, currentBlock, currentBlockCellCoordinateMap]
     );

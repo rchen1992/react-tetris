@@ -3,6 +3,7 @@ import { useStore } from 'store';
 import styled from 'styled-components';
 import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
+import { MOVEMENT_DIRECTIONS } from 'blocks';
 
 const Grid = styled.div`
     display: grid;
@@ -25,16 +26,14 @@ function Game() {
         currentBlock,
         currentBlockCellCoordinateMap,
         rotateCurrentBlock,
-        moveCurrentBlockLeft,
-        moveCurrentBlockRight,
-        moveCurrentBlockDown,
+        moveCurrentBlock,
     } = useStore();
 
     useKeyboardListeners({
         ArrowUp: () => rotateCurrentBlock(),
-        ArrowLeft: () => moveCurrentBlockLeft(),
-        ArrowRight: () => moveCurrentBlockRight(),
-        ArrowDown: () => moveCurrentBlockDown(),
+        ArrowLeft: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.LEFT),
+        ArrowRight: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.RIGHT),
+        ArrowDown: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN),
     });
 
     console.log(currentBlockCellCoordinateMap.entries());

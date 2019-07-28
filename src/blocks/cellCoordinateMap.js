@@ -49,14 +49,14 @@ function getNewCellCoordinateMap() {
  * on the grid that should be marked "active" because the current block
  * is occupying that cell.
  *
- * @param {object} block - object repesenting a block
+ * @param {object} blockShape - matrix representing block shape
  * @param {tuple} currentBlockCoordinates - `[row, col]`
  */
-export default function getCurrentBlockCellCoordinateMap(block, currentBlockCoordinates) {
+export default function getCurrentBlockCellCoordinateMap(blockShape, currentBlockCoordinates) {
     const [currentBlockRow, currentBlockCol] = currentBlockCoordinates;
     let coords = getNewCellCoordinateMap();
 
-    block.shape.forEach((row, rowIndex) => {
+    blockShape.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
             if (cell === 1) {
                 const coord = [rowIndex + currentBlockRow, cellIndex + currentBlockCol];

@@ -7,14 +7,10 @@ function rotateMatrixClockwise(matrix) {
 }
 
 /**
- * Returns a new rotated version of a block.
- * `block.shape` should be a matrix.
+ * Returns a new rotated version of a block shape matrix.
  *
- * @param {object} block
+ * @param {array} block - matrix
  */
-export default function rotateBlock(block) {
-    return {
-        ...block,
-        shape: rotateMatrixClockwise(block.shape),
-    };
+export default function rotateBlock(blockShape) {
+    return rotateMatrixClockwise(blockShape);
 }

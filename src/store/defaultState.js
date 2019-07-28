@@ -1,12 +1,9 @@
 import blocks, { BLOCK_TYPES } from 'blocks';
 import getCurrentBlockCellCoordinateMap from 'blocks/cellCoordinateMap';
+import { createGrid } from 'grid';
 
-const GRID_WIDTH = 10;
-const GRID_HEIGHT = 20;
-
-function createGrid(height, width) {
-    return Array(height).fill(Array(width).fill(null));
-}
+export const GRID_WIDTH = 10;
+export const GRID_HEIGHT = 20;
 
 const startingBlockCoordinates = [0, 3];
 const startingBlock = blocks[BLOCK_TYPES.T];
@@ -18,7 +15,7 @@ export default {
         positionCoordinates: startingBlockCoordinates,
     },
     currentBlockCellCoordinateMap: getCurrentBlockCellCoordinateMap(
-        startingBlock,
+        startingBlock.shape,
         startingBlockCoordinates
     ),
 };
