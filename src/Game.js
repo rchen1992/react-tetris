@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from 'store';
 import styled from 'styled-components';
 import { math } from 'polished';
+import useKeyboardListeners from 'hooks/useKeyboardListeners';
 
 const Grid = styled.div`
     display: grid;
@@ -19,8 +20,14 @@ const Cell = styled.span`
 `;
 
 function Game() {
-    const { grid, currentBlock } = useStore();
+    const { grid, currentBlock, rotateCurrentBlock } = useStore();
     const { properties, positionCoordinates, cellCoordinateMap } = currentBlock;
+
+    useKeyboardListeners({
+        ArrowUp: () => {
+            rotateCurrentBlock();
+        },
+    });
 
     console.log(cellCoordinateMap.entries());
     console.log(currentBlock);

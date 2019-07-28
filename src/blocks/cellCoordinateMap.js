@@ -54,8 +54,8 @@ function getNewCellCoordinateMap() {
  */
 export default function getCurrentBlockCellCoordinateMap(block, currentBlockCoordinates) {
     const [currentBlockRow, currentBlockCol] = currentBlockCoordinates;
-
     let coords = getNewCellCoordinateMap();
+
     block.shape.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
             if (cell === 1) {
