@@ -18,7 +18,7 @@ export function cloneGrid(grid) {
  * Returns true if coordinates are within grid bounds.
  *
  * @param {array} grid
- * @param {Set} coordinateSet - set of [row,col] coordinates
+ * @param {Set} coordinateSet - set of [row,col] coordinates for given block
  */
 export function isWithinGridBounds(grid, coordinateSet) {
     return coordinateSet.keysArray().every(([row, col]) => {
@@ -31,7 +31,7 @@ export function isWithinGridBounds(grid, coordinateSet) {
  * with another block on the grid.
  *
  * @param {array} grid - matrix
- * @param {Set} coordinateSet - set of [row,col] coordinates
+ * @param {Set} coordinateSet - set of [row,col] coordinates for given block
  */
 export function hasNoBlockCollisions(grid, coordinateSet) {
     return coordinateSet.keysArray().every(([row, col]) => {
@@ -40,8 +40,7 @@ export function hasNoBlockCollisions(grid, coordinateSet) {
 }
 
 /**
- * Returns true if the given block's position does not collide
- * with another block on the grid.
+ * Returns true if a block's position is valid.
  *
  * @param {array} grid - matrix
  * @param {tuple} coordinates - [row,col] coordinates
