@@ -1,3 +1,5 @@
+import getBlockCellCoordinateSet from 'blocks/cellCoordinateSet';
+
 export function createGrid(height, width) {
     return Array(height).fill(Array(width).fill(null));
 }
@@ -16,41 +18,36 @@ export function cloneGrid(grid) {
  * Returns true if coordinates are within grid bounds.
  *
  * @param {array} grid
- * @param {tuple} coordinates
- * @param {object} blockShape
+ * @param {Set} coordinateSet - set of [row,col] coordinates
  */
-export function isWithinGridBounds(grid, coordinates, blockShape) {
-    const [row, col] = coordinates;
-    const currentBlockRowSpan = blockShape.length;
-    const currentBlockColSpan = blockShape[0].length;
+export function isWithinGridBounds(grid, coordinateSet) {
+    return coordinateSet.keysArray().every(([row, col]) => {
+        return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length;
+    });
+}
 
-    /**
-     * Explanation for this weird condition:
-     * `col < grid[0].length - currentBlockColSpan + 1`
-     *
-     * We have to account for the current block's row and col span
-     * when checking the bounds.
-     *
-     * In the example below:
-     * - `coordinates` is [1, 6]
-     * - `blockShape` is the `I` block: `[ [1, 1, 1, 1] ]`
-     *
-     * So we use the check to see if we are at the end
-     * of right side of the grid.
-     * The same logic applies for the bottom of the grid.
-     *
-     * [0][0][0][0][0][0][0][0][0][0]
-     * [0][0][0][0][0][0][1][1][1][1]
-     * [0][0][0][0][0][0][0][0][0][0]
-     * [0][0][0][0][0][0][0][0][0][0]
-     * [0][0][0][0][0][0][0][0][0][0]
-     * [0][0][0][0][0][0][0][0][0][0]
-     * [0][0][0][0][0][0][0][0][0][0]
-     */
-    return (
-        row >= 0 &&
-        row < grid.length - currentBlockRowSpan + 1 &&
-        col >= 0 &&
-        col < grid[0].length - currentBlockColSpan + 1
-    );
+/**
+ * Returns true if the given block's position does not collide
+ * with another block on the grid.
+ *
+ * @param {array} grid - matrix
+ * @param {Set} coordinateSet - set of [row,col] coordinates
+ */
+export function hasNoBlockCollisions(grid, coordinateSet) {
+    return coordinateSet.keysArray().every(([row, col]) => {
+        return grid[row][col] === null;
+    });
+}
+
+/**
+ * Returns true if the given block's position does not collide
+ * with another block on the grid.
+ *
+ * @param {array} grid - matrix
+ * @param {tuple} coordinates - [row,col] coordinates
+ * @param {array} blockShape - matrix
+ */
+export function isValidBlockMove(grid, coordinates, blockShape) {
+    const coordinateSet = getBlockCellCoordinateSet(blockShape, coordinates);
+    return isWithinGridBounds(grid, coordinateSet) && hasNoBlockCollisions(grid, coordinateSet);
 }

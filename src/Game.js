@@ -27,7 +27,7 @@ function Game() {
     const {
         grid,
         currentBlock,
-        currentBlockCellCoordinateMap,
+        currentBlockCellCoordinateSet,
         rotateCurrentBlock,
         moveCurrentBlock,
     } = useStore();
@@ -39,14 +39,14 @@ function Game() {
         ArrowDown: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN),
     });
 
-    console.log(currentBlockCellCoordinateMap.keysArray());
+    console.log(currentBlockCellCoordinateSet.keysArray());
     console.log(currentBlock);
 
     let cells = [];
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
             let blockType = grid[i][j];
-            if (!blockType && currentBlockCellCoordinateMap.has([i, j])) {
+            if (!blockType && currentBlockCellCoordinateSet.has([i, j])) {
                 blockType = currentBlock.properties.type;
             }
 

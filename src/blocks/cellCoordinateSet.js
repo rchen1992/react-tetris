@@ -5,7 +5,7 @@
  *
  * Example) [1,2] => '1,2'
  */
-const cellCoordinateMapProxyHandler = {
+const cellCoordinateSetProxyHandler = {
     get(obj, prop) {
         switch (prop) {
             case 'add':
@@ -48,24 +48,23 @@ const cellCoordinateMapProxyHandler = {
  * Returns a Set wrapped in a proxy to represent
  * a set of active cell coordinates.
  */
-function getNewCellCoordinateMap() {
-    return new Proxy(new Set(), cellCoordinateMapProxyHandler);
+function getNewCellCoordinateSet() {
+    return new Proxy(new Set(), cellCoordinateSetProxyHandler);
 }
 
 /**
  * Use a block's shape, current orientation, and current position on the grid
- * to determine the cell coordinate map for the current block.
+ * to determine the cell coordinate set for the block.
  *
- * This mapping will be used to describe the coordinates for the cells
- * on the grid that should be marked "active" because the current block
- * is occupying that cell.
+ * This set will be used to easily determine the coordinates for each individual cell
+ * on the grid that a block occupies.
  *
  * @param {object} blockShape - matrix representing block shape
- * @param {tuple} currentBlockCoordinates - `[row, col]`
+ * @param {tuple} coordinates - `[row, col]`
  */
-export default function getCurrentBlockCellCoordinateMap(blockShape, currentBlockCoordinates) {
-    const [currentBlockRow, currentBlockCol] = currentBlockCoordinates;
-    let coords = getNewCellCoordinateMap();
+export default function getBlockCellCoordinateSet(blockShape, coordinates) {
+    const [currentBlockRow, currentBlockCol] = coordinates;
+    let coords = getNewCellCoordinateSet();
 
     blockShape.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
