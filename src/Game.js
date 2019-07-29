@@ -30,6 +30,7 @@ function Game() {
         currentBlockCellCoordinateSet,
         rotateCurrentBlock,
         moveCurrentBlock,
+        dropBlock,
     } = useStore();
 
     useKeyboardListeners({
@@ -37,6 +38,8 @@ function Game() {
         ArrowLeft: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.LEFT),
         ArrowRight: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.RIGHT),
         ArrowDown: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN),
+        ' ': () => dropBlock(), // spacebar
+        Spacebar: () => dropBlock(), // spacebar for older browsers
     });
 
     console.log(currentBlockCellCoordinateSet.keysArray());

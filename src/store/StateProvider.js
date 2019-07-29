@@ -81,6 +81,38 @@ function StateProvider(props) {
     }
 
     /**
+     * Drops current block straight down to next available position.
+     */
+    function dropBlock() {
+        /**
+         * Continually move block downwards and check if it is a valid move.
+         * As soon as it is invalid, we know the final location for the block
+         * should be just before the last move.
+         */
+        const [row, col] = currentBlock.positionCoordinates;
+        let rowMove = 1;
+        while (isValidBlockMove(grid, [row + rowMove, col], currentBlock.properties.shape)) {
+            rowMove += 1;
+        }
+
+        /**
+         * Move block to new location.
+         * Note: we do `rowMove - 1` because we went past the last
+         * valid position for a block.
+         */
+        const newCoords = [row + rowMove - 1, col];
+        setCurrentBlock(prevBlock => ({
+            ...prevBlock,
+            positionCoordinates: newCoords,
+        }));
+
+        /**
+         * A dropped block should also be committed at the same time.
+         */
+        commitCurrentBlock();
+    }
+
+    /**
      * Compute cell coordinate set for current block.
      */
     currentBlockCellCoordinateSet.current = getBlockCellCoordinateSet(
@@ -95,6 +127,7 @@ function StateProvider(props) {
             currentBlockCellCoordinateSet: currentBlockCellCoordinateSet.current,
             rotateCurrentBlock,
             moveCurrentBlock,
+            dropBlock,
         }),
         [grid, currentBlock, currentBlockCellCoordinateSet]
     );
