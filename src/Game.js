@@ -19,22 +19,7 @@ const Grid = styled.div`
 const Cell = styled.span`
     border: 1px solid black;
     background-color: ${props => {
-        if (props.isCurrentBlockCell) {
-            return 'blue';
-        }
-
-        switch (props.blockType) {
-            case BLOCK_TYPES.I:
-            case BLOCK_TYPES.L:
-            case BLOCK_TYPES.J:
-            case BLOCK_TYPES.Z:
-            case BLOCK_TYPES.S:
-            case BLOCK_TYPES.O:
-            case BLOCK_TYPES.T:
-                return 'blue';
-        }
-
-        return 'none';
+        return props.theme.blockColors[props.blockType] || 'none';
     }};
 `;
 
@@ -60,15 +45,12 @@ function Game() {
     let cells = [];
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
-            cells.push(
-                <Cell
-                    key={`${i}${j}`}
-                    row={i}
-                    col={j}
-                    blockType={grid[i][j]}
-                    isCurrentBlockCell={currentBlockCellCoordinateMap.has([i, j])}
-                />
-            );
+            let blockType = grid[i][j];
+            if (!blockType && currentBlockCellCoordinateMap.has([i, j])) {
+                blockType = currentBlock.properties.type;
+            }
+
+            cells.push(<Cell key={`${i}${j}`} row={i} col={j} blockType={blockType} />);
         }
     }
 
