@@ -59,7 +59,7 @@ function StateProvider(props) {
         }
     }
 
-    function commitCurrentBlock() {
+    async function commitCurrentBlock() {
         /**
          * Get the list of coordinates for the current block
          * and then update the grid with those values.
@@ -76,7 +76,12 @@ function StateProvider(props) {
         /**
          * Clear any filled rows from the grid.
          */
-        clearRows(newGrid);
+        await clearRows(newGrid);
+
+        setCurrentBlock({
+            properties: getRandomNewBlock(),
+            positionCoordinates: STARTING_BLOCK_COORDINATES,
+        });
     }
 
     /**
@@ -113,53 +118,41 @@ function StateProvider(props) {
 
     /**
      * Clears any filled rows on the grid with an animation.
+     * Promise resolves when animation finishes OR when
+     * there are no rows to clear.
      */
     function clearRows(grid) {
-        /**
-         * Array of indexes for rows that are filled and should be cleared.
-         */
-        const clearedRowNumbers = grid.reduce((result, row, rowIndex) => {
-            if (row.every(cell => cell !== null)) {
-                result.push(rowIndex);
+        return new Promise((resolve, reject) => {
+            /**
+             * Array of indexes for rows that are filled and should be cleared.
+             */
+            const clearedRowNumbers = grid.reduce((result, row, rowIndex) => {
+                if (row.every(cell => cell !== null)) {
+                    result.push(rowIndex);
+                }
+                return result;
+            }, []);
+
+            /**
+             * If we have filled rows to clear,
+             * we first need to animate the clearing of those rows.
+             */
+            if (clearedRowNumbers.length > 0) {
+                setAnimatedRows(clearedRowNumbers);
+
+                /**
+                 * After animation finishes, clear lines from grid
+                 */
+                setTimeout(() => {
+                    setAnimatedRows([]);
+                    setGrid(clearFilledRows(grid));
+
+                    resolve();
+                }, CLEAR_ROW_ANIMATION_DURATION);
+            } else {
+                resolve();
             }
-            return result;
-        }, []);
-
-        /**
-         * If we have filled rows to clear,
-         * we first need to animate the clearing of those rows.
-         */
-        if (clearedRowNumbers.length > 0) {
-            setAnimatedRows(clearedRowNumbers);
-
-            /**
-             * After animation finishes,
-             * clear lines from grid, and generate the new block.
-             *
-             * We don't want the user to be able to seee
-             * or manipulate the current block until after the
-             * animation is done.
-             */
-            setTimeout(() => {
-                setAnimatedRows([]);
-
-                setGrid(clearFilledRows(grid));
-
-                setCurrentBlock({
-                    properties: getRandomNewBlock(),
-                    positionCoordinates: STARTING_BLOCK_COORDINATES,
-                });
-            }, CLEAR_ROW_ANIMATION_DURATION);
-        } else {
-            /**
-             * If we don't have lines to clear,
-             * simply generate the new current block.
-             */
-            setCurrentBlock({
-                properties: getRandomNewBlock(),
-                positionCoordinates: STARTING_BLOCK_COORDINATES,
-            });
-        }
+        });
     }
 
     /**
