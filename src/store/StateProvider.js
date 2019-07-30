@@ -5,10 +5,12 @@ import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet from 'blocks/cellCoordinateSet';
 import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
+import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
+    const [animatedRows, setAnimatedRows] = React.useState([]);
     const currentBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
@@ -72,17 +74,9 @@ function StateProvider(props) {
         setGrid(newGrid);
 
         /**
-         * Generate new current block.
-         */
-        setCurrentBlock({
-            properties: getRandomNewBlock(),
-            positionCoordinates: STARTING_BLOCK_COORDINATES,
-        });
-
-        /**
          * Clear any filled rows from the grid.
          */
-        setGrid(clearFilledRows(newGrid));
+        clearRows(newGrid);
     }
 
     /**
@@ -118,6 +112,57 @@ function StateProvider(props) {
     }
 
     /**
+     * Clears any filled rows on the grid with an animation.
+     */
+    function clearRows(grid) {
+        /**
+         * Array of indexes for rows that are filled and should be cleared.
+         */
+        const clearedRowNumbers = grid.reduce((result, row, rowIndex) => {
+            if (row.every(cell => cell !== null)) {
+                result.push(rowIndex);
+            }
+            return result;
+        }, []);
+
+        /**
+         * If we have filled rows to clear,
+         * we first need to animate the clearing of those rows.
+         */
+        if (clearedRowNumbers.length > 0) {
+            setAnimatedRows(clearedRowNumbers);
+
+            /**
+             * After animation finishes,
+             * clear lines from grid, and generate the new block.
+             *
+             * We don't want the user to be able to seee
+             * or manipulate the current block until after the
+             * animation is done.
+             */
+            setTimeout(() => {
+                setAnimatedRows([]);
+
+                setGrid(clearFilledRows(grid));
+
+                setCurrentBlock({
+                    properties: getRandomNewBlock(),
+                    positionCoordinates: STARTING_BLOCK_COORDINATES,
+                });
+            }, CLEAR_ROW_ANIMATION_DURATION);
+        } else {
+            /**
+             * If we don't have lines to clear,
+             * simply generate the new current block.
+             */
+            setCurrentBlock({
+                properties: getRandomNewBlock(),
+                positionCoordinates: STARTING_BLOCK_COORDINATES,
+            });
+        }
+    }
+
+    /**
      * Compute cell coordinate set for current block.
      */
     currentBlockCellCoordinateSet.current = getBlockCellCoordinateSet(
@@ -129,12 +174,13 @@ function StateProvider(props) {
         () => ({
             grid,
             currentBlock,
+            animatedRows,
             currentBlockCellCoordinateSet: currentBlockCellCoordinateSet.current,
             rotateCurrentBlock,
             moveCurrentBlock,
             dropBlock,
         }),
-        [grid, currentBlock, currentBlockCellCoordinateSet]
+        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet]
     );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;

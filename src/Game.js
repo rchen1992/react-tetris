@@ -1,10 +1,10 @@
 import React from 'react';
 import { useStore } from 'store';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks';
-import { BLOCK_TYPES } from 'blocks';
+import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
 
 const Grid = styled.div`
     display: grid;
@@ -21,12 +21,19 @@ const Cell = styled.span`
     background-color: ${props => {
         return props.theme.blockColors[props.blockType] || 'none';
     }};
+
+    ${props =>
+        props.animatingClear &&
+        css`
+            animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
+        `};
 `;
 
 function Game() {
     const {
         grid,
         currentBlock,
+        animatedRows,
         currentBlockCellCoordinateSet,
         rotateCurrentBlock,
         moveCurrentBlock,
@@ -53,7 +60,15 @@ function Game() {
                 blockType = currentBlock.properties.type;
             }
 
-            cells.push(<Cell key={`${i}${j}`} row={i} col={j} blockType={blockType} />);
+            cells.push(
+                <Cell
+                    key={`${i}${j}`}
+                    row={i}
+                    col={j}
+                    blockType={blockType}
+                    animatingClear={animatedRows.includes(i)}
+                />
+            );
         }
     }
 
