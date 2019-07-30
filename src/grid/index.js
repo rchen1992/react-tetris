@@ -50,3 +50,30 @@ export function isValidBlockMove(grid, coordinates, blockShape) {
     const coordinateSet = getBlockCellCoordinateSet(blockShape, coordinates);
     return isWithinGridBounds(grid, coordinateSet) && hasNoBlockCollisions(grid, coordinateSet);
 }
+
+/**
+ * Takes a grid and returns a new grid that has filled rows removed.
+ *
+ * @param {array} grid - matrix
+ */
+export function clearFilledRows(grid) {
+    // Get all rows that are NOT completely filled.
+    const unfilledRows = grid.filter(row => row.some(cell => cell === null));
+
+    // Get number of rows cleared.
+    const clearedRowCount = grid.length - unfilledRows.length;
+
+    /**
+     * If we cleared any rows,
+     * we need to remove those rows from the grid.
+     */
+    if (clearedRowCount > 0) {
+        /**
+         * Create a grid that is the same size as the cleared rows,
+         * and combine it with the grid of uncleared rows.
+         */
+        return [...createGrid(clearedRowCount, grid[0].length), ...unfilledRows];
+    } else {
+        return grid;
+    }
+}

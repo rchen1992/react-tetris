@@ -4,7 +4,7 @@ import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
 import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet from 'blocks/cellCoordinateSet';
-import { isValidBlockMove, cloneGrid } from 'grid';
+import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
@@ -78,6 +78,11 @@ function StateProvider(props) {
             properties: getRandomNewBlock(),
             positionCoordinates: STARTING_BLOCK_COORDINATES,
         });
+
+        /**
+         * Clear any filled rows from the grid.
+         */
+        setGrid(clearFilledRows(newGrid));
     }
 
     /**
