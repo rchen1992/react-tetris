@@ -27,7 +27,7 @@ import React from 'react';
  * of the first and second key event.
  * This is useful for responding to the holding down of a key in a smooth and consistent way.
  */
-export default function useKeyboardListeners(handlers, activeEventInterval = 100) {
+export default function useKeyboardListeners(handlers, activeEventInterval = 120) {
     const [shouldFireActiveEvents, setShouldFireActiveEvents] = React.useState(false);
     const activeEvent = React.useRef(null);
     const callbackLoop = React.useRef(null);
