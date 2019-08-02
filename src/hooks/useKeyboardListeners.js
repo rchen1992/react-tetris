@@ -25,12 +25,19 @@ import React from 'react';
  *
  * Normally when you hold a key down, there is a delay between when the firing
  * of the first and second key event.
- * This is useful for responding to the holding down of a key in a smooth and consistent way.
+ * `isActiveEvent` useful for responding to the holding down of a key
+ * in a smooth and consistent way.
  */
 export default function useKeyboardListeners(handlers, activeEventInterval = 120) {
-    const [shouldFireActiveEvents, setShouldFireActiveEvents] = React.useState(false);
     const activeEvent = React.useRef(null);
     const callbackLoop = React.useRef(null);
+
+    /**
+     * Create ref container for handlers, so that they
+     * can be accessed in callback loop.
+     */
+    const handlersRef = React.useRef(handlers);
+    handlersRef.current = handlers;
 
     function onKeyDown(e) {
         const handler = handlers[e.key];
@@ -57,19 +64,12 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
             clearTimeout(callbackLoop.current);
             activeEvent.current = e.key;
 
-            /**
-             * This loop continually sets a flag that indicates that
-             * the active event callback is OK to be fired again.
-             *
-             * The reason we don't just call the callback directly from
-             * this function is that it would form a closure over the
-             * callback function and call the same version of the function
-             * over and over again.
-             */
             function runCallbackLoop() {
                 callbackLoop.current = setTimeout(() => {
-                    setShouldFireActiveEvents(true);
-                    runCallbackLoop();
+                    if (activeEvent.current !== null) {
+                        handlersRef.current[activeEvent.current].callback();
+                        runCallbackLoop();
+                    }
                 }, activeEventInterval);
             }
 
@@ -90,18 +90,6 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
             clearTimeout(callbackLoop.current);
         }
     }
-
-    /**
-     * This effect pairs with `runCallbackLoop`.
-     * After every render, if there is an active event and we are
-     * able to fire it, then we should fire its callback.
-     */
-    React.useEffect(() => {
-        if (shouldFireActiveEvents && activeEvent.current !== null) {
-            setShouldFireActiveEvents(false);
-            handlers[activeEvent.current].callback();
-        }
-    });
 
     React.useEffect(() => {
         document.addEventListener('keydown', onKeyDown);
