@@ -11,6 +11,7 @@ function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
     const [animatedRows, setAnimatedRows] = React.useState([]);
+    const [gameSpeed, setGameSpeed] = React.useState(defaultState.gameSpeed);
     const currentBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
@@ -189,8 +190,9 @@ function StateProvider(props) {
             rotateCurrentBlock,
             moveCurrentBlock,
             dropBlock,
+            gameSpeed,
         }),
-        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet]
+        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed]
     );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;

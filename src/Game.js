@@ -30,6 +30,7 @@ const Cell = styled.span`
 `;
 
 function Game() {
+    const store = useStore();
     const {
         grid,
         currentBlock,
@@ -38,8 +39,38 @@ function Game() {
         rotateCurrentBlock,
         moveCurrentBlock,
         dropBlock,
-    } = useStore();
+        gameSpeed,
+    } = store;
 
+    const gameTick = React.useRef(null);
+
+    /**
+     * We put the entire store into a ref "container"
+     * and keep it updated every render
+     * so that we can access the store's latest values
+     * in the `setInterval` loop.
+     *
+     * Otherwise, if we use store methods/variables directly in the
+     * `setInterval` callback, the callback forms a closure over those
+     * variables, which will never change, even when the component is
+     * re-rendered.
+     */
+    const storeRef = React.useRef(store);
+    storeRef.current = store;
+
+    React.useEffect(() => {
+        gameTick.current = setInterval(() => {
+            storeRef.current.moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN);
+        }, gameSpeed);
+
+        return () => {
+            clearInterval(gameTick.current);
+        };
+    }, []);
+
+    /**
+     * Keyboard controls.
+     */
     useKeyboardListeners({
         ArrowUp: {
             callback: () => rotateCurrentBlock(),

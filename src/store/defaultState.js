@@ -7,6 +7,8 @@ export const GRID_HEIGHT = 20;
 
 export const STARTING_BLOCK_COORDINATES = [0, 3];
 
+export const STARTING_GAME_SPEED = 1000;
+
 const startingBlock = blocks[BLOCK_TYPES.T];
 
 export default {
@@ -19,4 +21,5 @@ export default {
         startingBlock.shape,
         STARTING_BLOCK_COORDINATES
     ),
+    gameSpeed: STARTING_GAME_SPEED,
 };
