@@ -66,7 +66,7 @@ function Game() {
         return () => {
             clearInterval(gameTick.current);
         };
-    }, []);
+    }, [gameSpeed]);
 
     /**
      * Keyboard controls.
