@@ -48,7 +48,7 @@ const cellCoordinateSetProxyHandler = {
  * Returns a Set wrapped in a proxy to represent
  * a set of active cell coordinates.
  */
-function getNewCellCoordinateSet() {
+export function getNewCellCoordinateSet() {
     return new Proxy(new Set(), cellCoordinateSetProxyHandler);
 }
 

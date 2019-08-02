@@ -3,7 +3,7 @@ import StateContext from './StateContext';
 import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
 import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
-import getBlockCellCoordinateSet from 'blocks/cellCoordinateSet';
+import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
 import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
 
@@ -14,6 +14,8 @@ function StateProvider(props) {
     const currentBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
+        if (!currentBlock) return;
+
         const { positionCoordinates, properties } = currentBlock;
         const rotatedBlockShape = rotateBlock(properties.shape);
 
@@ -29,6 +31,8 @@ function StateProvider(props) {
     }
 
     function moveCurrentBlock(direction) {
+        if (!currentBlock) return;
+
         const [row, col] = currentBlock.positionCoordinates;
 
         let newCoords;
@@ -60,6 +64,8 @@ function StateProvider(props) {
     }
 
     async function commitCurrentBlock() {
+        if (!currentBlock) return;
+
         /**
          * Get the list of coordinates for the current block
          * and then update the grid with those values.
@@ -74,10 +80,19 @@ function StateProvider(props) {
         setGrid(newGrid);
 
         /**
+         * Clear current block first so that we can't try to move it
+         * while any clear row animation is running.
+         */
+        setCurrentBlock(null);
+
+        /**
          * Clear any filled rows from the grid.
          */
         await clearRows(newGrid);
 
+        /**
+         * Generate new current block.
+         */
         setCurrentBlock({
             properties: getRandomNewBlock(),
             positionCoordinates: STARTING_BLOCK_COORDINATES,
@@ -88,6 +103,8 @@ function StateProvider(props) {
      * Drops current block straight down to next available position.
      */
     function dropBlock() {
+        if (!currentBlock) return;
+
         /**
          * Continually move block downwards and check if it is a valid move.
          * As soon as it is invalid, we know the final location for the block
@@ -157,11 +174,11 @@ function StateProvider(props) {
 
     /**
      * Compute cell coordinate set for current block.
+     * If there is no current block, we will just use an empty coordinate set.
      */
-    currentBlockCellCoordinateSet.current = getBlockCellCoordinateSet(
-        currentBlock.properties.shape,
-        currentBlock.positionCoordinates
-    );
+    currentBlockCellCoordinateSet.current = currentBlock
+        ? getBlockCellCoordinateSet(currentBlock.properties.shape, currentBlock.positionCoordinates)
+        : getNewCellCoordinateSet();
 
     const state = React.useMemo(
         () => ({
