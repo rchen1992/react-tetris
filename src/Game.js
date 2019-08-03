@@ -34,7 +34,7 @@ const Cell = styled.span`
 const GridOverlay = styled.div`
     width: 100%;
     height: 100%;
-    background-color: white;
+    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'white')};
     z-index: ${({ theme }) => theme.gridOverlayZIndex};
     position: absolute;
     display: flex;
@@ -50,6 +50,11 @@ const NewGameButton = styled.button`
     border-radius: 6px;
 `;
 
+const Paused = styled.p`
+    background-color: white;
+    padding: 20px;
+`;
+
 function Game() {
     const store = useStore();
     const {
@@ -63,6 +68,7 @@ function Game() {
         gameSpeed,
         gameState,
         setGameState,
+        togglePauseGame,
     } = store;
 
     const gameTick = React.useRef(null);
@@ -117,6 +123,12 @@ function Game() {
         Spacebar: {
             callback: () => dropBlock(), // spacebar for older browsers
         },
+        Escape: {
+            callback: () => togglePauseGame(),
+        },
+        Esc: {
+            callback: () => togglePauseGame(), // IE/Edge
+        },
     });
 
     let cells = [];
@@ -140,16 +152,24 @@ function Game() {
     }
 
     return (
-        <Grid height={grid.length} width={grid[0].length}>
-            {gameState === GAME_STATES.NEW_GAME && (
-                <GridOverlay>
-                    <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
-                        New Game
-                    </NewGameButton>
-                </GridOverlay>
-            )}
-            {cells}
-        </Grid>
+        <div>
+            <Grid height={grid.length} width={grid[0].length}>
+                {gameState === GAME_STATES.NEW_GAME && (
+                    <GridOverlay>
+                        <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
+                            New Game
+                        </NewGameButton>
+                    </GridOverlay>
+                )}
+                {gameState === GAME_STATES.PAUSED && (
+                    <GridOverlay type="dark">
+                        <Paused>Paused</Paused>
+                    </GridOverlay>
+                )}
+                {cells}
+            </Grid>
+            <div onClick={togglePauseGame}>Pause</div>
+        </div>
     );
 }
 

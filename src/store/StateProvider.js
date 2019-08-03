@@ -180,6 +180,23 @@ function StateProvider(props) {
     }
 
     /**
+     * Toggles between playing and paused states.
+     * Note: a game can only be paused if it is currently playing.
+     * Otherwise it does nothing.
+     */
+    function togglePauseGame() {
+        setGameState(prevState => {
+            if (prevState === GAME_STATES.PLAYING) {
+                return GAME_STATES.PAUSED;
+            } else if (prevState === GAME_STATES.PAUSED) {
+                return GAME_STATES.PLAYING;
+            } else {
+                return prevState;
+            }
+        });
+    }
+
+    /**
      * Compute cell coordinate set for current block.
      * If there is no current block, we will just use an empty coordinate set.
      */
@@ -199,6 +216,7 @@ function StateProvider(props) {
             gameSpeed,
             gameState,
             setGameState,
+            togglePauseGame,
         }),
         [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed, gameState]
     );
