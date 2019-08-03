@@ -6,6 +6,7 @@ import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
 import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
+import GAME_STATES from 'constants/gameStates';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
@@ -16,7 +17,7 @@ function StateProvider(props) {
     const currentBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         const { positionCoordinates, properties } = currentBlock;
         const rotatedBlockShape = rotateBlock(properties.shape);
@@ -33,7 +34,7 @@ function StateProvider(props) {
     }
 
     function moveCurrentBlock(direction) {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         const [row, col] = currentBlock.positionCoordinates;
 
@@ -66,7 +67,7 @@ function StateProvider(props) {
     }
 
     async function commitCurrentBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         /**
          * Get the list of coordinates for the current block
@@ -105,7 +106,7 @@ function StateProvider(props) {
      * Drops current block straight down to next available position.
      */
     function dropBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         /**
          * Continually move block downwards and check if it is a valid move.
@@ -172,6 +173,10 @@ function StateProvider(props) {
                 resolve();
             }
         });
+    }
+
+    function canPerformAction() {
+        return gameState === GAME_STATES.PLAYING && currentBlock;
     }
 
     /**
