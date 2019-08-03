@@ -1,6 +1,6 @@
 import React from 'react';
 import StateContext from './StateContext';
-import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
+import defaultState, { STARTING_BLOCK_COORDINATES, generateStartingBlock } from './defaultState';
 import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
@@ -253,6 +253,20 @@ function StateProvider(props) {
     }
 
     /**
+     * Full reset of game state.
+     */
+    function restartGame() {
+        setGrid(defaultState.grid);
+        setCurrentBlock(generateStartingBlock());
+        setGameSpeed(defaultState.gameSpeed);
+        setAnimatedRows([]);
+
+        currentBlockCellCoordinateSet.current = null;
+
+        setGameState(GAME_STATES.PLAYING);
+    }
+
+    /**
      * Compute cell coordinate set for current block.
      * If there is no current block, we will just use an empty coordinate set.
      */
@@ -273,6 +287,7 @@ function StateProvider(props) {
             gameState,
             setGameState,
             togglePauseGame,
+            restartGame,
         }),
         [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed, gameState]
     );

@@ -8,12 +8,16 @@ export const GRID_HEIGHT = 20;
 
 export const STARTING_BLOCK_COORDINATES = [0, 3];
 
-export default {
-    grid: createGrid(GRID_HEIGHT, GRID_WIDTH),
-    currentBlock: {
+export function generateStartingBlock() {
+    return {
         properties: getRandomNewBlock(),
         positionCoordinates: STARTING_BLOCK_COORDINATES,
-    },
+    };
+}
+
+export default {
+    grid: createGrid(GRID_HEIGHT, GRID_WIDTH),
+    currentBlock: generateStartingBlock(),
     gameSpeed: GAME_SPEEDS.STARTING,
     gameState: GAME_STATES.NEW_GAME,
 };

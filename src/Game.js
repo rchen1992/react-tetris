@@ -50,7 +50,7 @@ const NewGameButton = styled.button`
     border-radius: 6px;
 `;
 
-const Paused = styled.p`
+const GameStateMenu = styled.div`
     background-color: white;
     padding: 20px;
 `;
@@ -69,6 +69,7 @@ function Game() {
         gameState,
         setGameState,
         togglePauseGame,
+        restartGame,
     } = store;
 
     const gameTick = React.useRef(null);
@@ -164,13 +165,16 @@ function Game() {
 
                 {gameState === GAME_STATES.PAUSED && (
                     <GridOverlay type="dark">
-                        <Paused>Paused</Paused>
+                        <GameStateMenu>Paused</GameStateMenu>
                     </GridOverlay>
                 )}
 
                 {gameState === GAME_STATES.GAME_OVER && (
                     <GridOverlay type="dark">
-                        <Paused>Game Over</Paused>
+                        <GameStateMenu>
+                            <p>Game Over</p>
+                            <button onClick={restartGame}>Restart</button>
+                        </GameStateMenu>
                     </GridOverlay>
                 )}
 
