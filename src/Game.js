@@ -161,11 +161,19 @@ function Game() {
                         </NewGameButton>
                     </GridOverlay>
                 )}
+
                 {gameState === GAME_STATES.PAUSED && (
                     <GridOverlay type="dark">
                         <Paused>Paused</Paused>
                     </GridOverlay>
                 )}
+
+                {gameState === GAME_STATES.GAME_OVER && (
+                    <GridOverlay type="dark">
+                        <Paused>Game Over</Paused>
+                    </GridOverlay>
+                )}
+
                 {cells}
             </Grid>
             <div onClick={togglePauseGame}>Pause</div>

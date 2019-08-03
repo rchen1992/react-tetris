@@ -4,7 +4,13 @@ import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
 import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
-import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
+import {
+    isValidBlockMove,
+    hasNoBlockCollisions,
+    cloneGrid,
+    clearFilledRows,
+    isWithinGridBounds,
+} from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 
@@ -70,6 +76,19 @@ function StateProvider(props) {
         if (!canPerformAction()) return;
 
         /**
+         * This is the check for the game over condition.
+         * The game is considered over when a block needs to be committed
+         * but it is out of grid bounds.
+         *
+         * Note: the only way a current block could be out of grid bounds
+         * is if it was moved out of bounds during its initial generation.
+         * @see generateNewCurrentBlock
+         */
+        if (!isWithinGridBounds(grid, currentBlockCellCoordinateSet.current)) {
+            return setGameState(GAME_STATES.GAME_OVER);
+        }
+
+        /**
          * Get the list of coordinates for the current block
          * and then update the grid with those values.
          */
@@ -93,13 +112,46 @@ function StateProvider(props) {
          */
         await clearRows(newGrid);
 
+        generateNewCurrentBlock(newGrid);
+    }
+
+    /**
+     * Generate new block at the top of the grid.
+     */
+    function generateNewCurrentBlock(newGrid) {
+        const blockType = getRandomNewBlock();
+        const [row, col] = STARTING_BLOCK_COORDINATES;
+        let newBlock;
+        let coordinateSet;
+        let currentRow = row;
+
         /**
-         * Generate new current block.
+         * We render new blocks at the top of the grid.
+         * This means that the new block could possibly render directly
+         * overlapping an existing block.
+         *
+         * To fix this, we check for a block collision before rendering,
+         * and then continue to move the block upwards until it is possible to render.
+         *
+         * This allows the user to potentially see part of a block at the top of the grid
+         * right before it's game over.
          */
-        setCurrentBlock({
-            properties: getRandomNewBlock(),
-            positionCoordinates: STARTING_BLOCK_COORDINATES,
-        });
+        do {
+            newBlock = {
+                properties: blockType,
+                positionCoordinates: [currentRow, col],
+            };
+
+            coordinateSet = getBlockCellCoordinateSet(
+                newBlock.properties.shape,
+                newBlock.positionCoordinates
+            );
+
+            // Move block up by one row.
+            currentRow -= 1;
+        } while (!hasNoBlockCollisions(newGrid, coordinateSet));
+
+        setCurrentBlock(newBlock);
     }
 
     /**
@@ -175,13 +227,17 @@ function StateProvider(props) {
         });
     }
 
+    /**
+     * Can perform an in-game action.
+     */
     function canPerformAction() {
         return gameState === GAME_STATES.PLAYING && currentBlock;
     }
 
     /**
      * Toggles between playing and paused states.
-     * Note: a game can only be paused if it is currently playing.
+     * Note: a game can only be paused if it is currently playing,
+     * and vice versa.
      * Otherwise it does nothing.
      */
     function togglePauseGame() {
