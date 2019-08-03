@@ -7,13 +7,13 @@ import React from 'react';
  * The keys of the `handlers` object should be the
  * same key for the KeyboardEvent. Example:
  *  {
- *      ArrowUp: () => { console.log('arrow up key was pressed'),
+ *      ArrowUp: () => { console.log('arrow up key was pressed') } ,
  *  }
  *
  * You can also provide an object with some options. Example:
  *  {
  *      ArrowUp: {
- *          callback: () => { console.log('arrow up key was pressed'),
+ *          callback: () => { console.log('arrow up key was pressed') },
  *          isActiveEvent: true,
  *      }
  *  }
@@ -25,7 +25,7 @@ import React from 'react';
  *
  * Normally when you hold a key down, there is a delay between when the firing
  * of the first and second key event.
- * `isActiveEvent` useful for responding to the holding down of a key
+ * `isActiveEvent` is useful for responding to the holding down of a key
  * in a smooth and consistent way.
  */
 export default function useKeyboardListeners(handlers, activeEventInterval = 120) {

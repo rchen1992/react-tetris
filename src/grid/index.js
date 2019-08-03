@@ -30,12 +30,16 @@ export function isWithinGridBounds(grid, coordinateSet) {
  * Returns true if the given block's position does not collide
  * with another block on the grid.
  *
+ * Note: if the block is out of grid bounds,
+ * it is technically NOT colliding with an existing block,
+ * and so this will return true.
+ *
  * @param {array} grid - matrix
  * @param {Set} coordinateSet - set of [row,col] coordinates for given block
  */
 export function hasNoBlockCollisions(grid, coordinateSet) {
     return coordinateSet.keysArray().every(([row, col]) => {
-        return grid[row][col] === null;
+        return grid[row] === undefined || grid[row][col] === null;
     });
 }
 

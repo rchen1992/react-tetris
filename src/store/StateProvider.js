@@ -1,21 +1,29 @@
 import React from 'react';
 import StateContext from './StateContext';
-import defaultState, { STARTING_BLOCK_COORDINATES } from './defaultState';
+import defaultState, { STARTING_BLOCK_COORDINATES, generateStartingBlock } from './defaultState';
 import rotateBlock from 'blocks/rotation';
 import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
-import { isValidBlockMove, cloneGrid, clearFilledRows } from 'grid';
+import {
+    isValidBlockMove,
+    hasNoBlockCollisions,
+    cloneGrid,
+    clearFilledRows,
+    isWithinGridBounds,
+} from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
+import GAME_STATES from 'constants/gameStates';
 
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
     const [animatedRows, setAnimatedRows] = React.useState([]);
     const [gameSpeed, setGameSpeed] = React.useState(defaultState.gameSpeed);
+    const [gameState, setGameState] = React.useState(defaultState.gameState);
     const currentBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         const { positionCoordinates, properties } = currentBlock;
         const rotatedBlockShape = rotateBlock(properties.shape);
@@ -32,7 +40,7 @@ function StateProvider(props) {
     }
 
     function moveCurrentBlock(direction) {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         const [row, col] = currentBlock.positionCoordinates;
 
@@ -65,7 +73,20 @@ function StateProvider(props) {
     }
 
     async function commitCurrentBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
+
+        /**
+         * This is the check for the game over condition.
+         * The game is considered over when a block needs to be committed
+         * but it is out of grid bounds.
+         *
+         * Note: the only way a current block could be out of grid bounds
+         * is if it was moved out of bounds during its initial generation.
+         * @see generateNewCurrentBlock
+         */
+        if (!isWithinGridBounds(grid, currentBlockCellCoordinateSet.current)) {
+            return setGameState(GAME_STATES.GAME_OVER);
+        }
 
         /**
          * Get the list of coordinates for the current block
@@ -91,20 +112,53 @@ function StateProvider(props) {
          */
         await clearRows(newGrid);
 
+        generateNewCurrentBlock(newGrid);
+    }
+
+    /**
+     * Generate new block at the top of the grid.
+     */
+    function generateNewCurrentBlock(newGrid) {
+        const blockType = getRandomNewBlock();
+        const [row, col] = STARTING_BLOCK_COORDINATES;
+        let newBlock;
+        let coordinateSet;
+        let currentRow = row;
+
         /**
-         * Generate new current block.
+         * We render new blocks at the top of the grid.
+         * This means that the new block could possibly render directly
+         * overlapping an existing block.
+         *
+         * To fix this, we check for a block collision before rendering,
+         * and then continue to move the block upwards until it is possible to render.
+         *
+         * This allows the user to potentially see part of a block at the top of the grid
+         * right before it's game over.
          */
-        setCurrentBlock({
-            properties: getRandomNewBlock(),
-            positionCoordinates: STARTING_BLOCK_COORDINATES,
-        });
+        do {
+            newBlock = {
+                properties: blockType,
+                positionCoordinates: [currentRow, col],
+            };
+
+            coordinateSet = getBlockCellCoordinateSet(
+                newBlock.properties.shape,
+                newBlock.positionCoordinates
+            );
+
+            // Move block up by one row.
+            currentRow -= 1;
+        } while (!hasNoBlockCollisions(newGrid, coordinateSet));
+
+        setCurrentBlock(newBlock);
     }
 
     /**
      * Drops current block straight down to next available position.
      */
     function dropBlock() {
-        if (!currentBlock) return;
+        if (!canPerformAction()) return;
 
         /**
          * Continually move block downwards and check if it is a valid move.
@@ -174,6 +228,45 @@ function StateProvider(props) {
     }
 
     /**
+     * Can perform an in-game action.
+     */
+    function canPerformAction() {
+        return gameState === GAME_STATES.PLAYING && currentBlock;
+    }
+
+    /**
+     * Toggles between playing and paused states.
+     * Note: a game can only be paused if it is currently playing,
+     * and vice versa.
+     * Otherwise it does nothing.
+     */
+    function togglePauseGame() {
+        setGameState(prevState => {
+            if (prevState === GAME_STATES.PLAYING) {
+                return GAME_STATES.PAUSED;
+            } else if (prevState === GAME_STATES.PAUSED) {
+                return GAME_STATES.PLAYING;
+            } else {
+                return prevState;
+            }
+        });
+    }
+
+    /**
+     * Full reset of game state.
+     */
+    function restartGame() {
+        setGrid(defaultState.grid);
+        setCurrentBlock(generateStartingBlock());
+        setGameSpeed(defaultState.gameSpeed);
+        setAnimatedRows([]);
+
+        currentBlockCellCoordinateSet.current = null;
+
+        setGameState(GAME_STATES.PLAYING);
+    }
+
+    /**
      * Compute cell coordinate set for current block.
      * If there is no current block, we will just use an empty coordinate set.
      */
@@ -191,8 +284,12 @@ function StateProvider(props) {
             moveCurrentBlock,
             dropBlock,
             gameSpeed,
+            gameState,
+            setGameState,
+            togglePauseGame,
+            restartGame,
         }),
-        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed]
+        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed, gameState]
     );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;

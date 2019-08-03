@@ -1,25 +1,23 @@
-import blocks, { BLOCK_TYPES } from 'blocks';
-import getBlockCellCoordinateSet from 'blocks/cellCoordinateSet';
+import { getRandomNewBlock } from 'blocks';
 import { createGrid } from 'grid';
+import GAME_STATES from 'constants/gameStates';
+import GAME_SPEEDS from 'constants/gameSpeeds';
 
 export const GRID_WIDTH = 10;
 export const GRID_HEIGHT = 20;
 
 export const STARTING_BLOCK_COORDINATES = [0, 3];
 
-export const STARTING_GAME_SPEED = 750;
-
-const startingBlock = blocks[BLOCK_TYPES.T];
+export function generateStartingBlock() {
+    return {
+        properties: getRandomNewBlock(),
+        positionCoordinates: STARTING_BLOCK_COORDINATES,
+    };
+}
 
 export default {
     grid: createGrid(GRID_HEIGHT, GRID_WIDTH),
-    currentBlock: {
-        properties: startingBlock,
-        positionCoordinates: STARTING_BLOCK_COORDINATES,
-    },
-    currentBlockCellCoordinateSet: getBlockCellCoordinateSet(
-        startingBlock.shape,
-        STARTING_BLOCK_COORDINATES
-    ),
-    gameSpeed: STARTING_GAME_SPEED,
+    currentBlock: generateStartingBlock(),
+    gameSpeed: GAME_SPEEDS.STARTING,
+    gameState: GAME_STATES.NEW_GAME,
 };

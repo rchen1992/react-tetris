@@ -5,6 +5,7 @@ import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks';
 import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
+import GAME_STATES from 'constants/gameStates';
 
 const Grid = styled.div`
     display: grid;
@@ -14,12 +15,13 @@ const Grid = styled.div`
     border: 1px solid black;
     margin: auto;
     margin-top: 50px;
+    position: relative;
 `;
 
 const Cell = styled.span`
     border: 1px solid black;
     background-color: ${props => {
-        return props.theme.blockColors[props.blockType] || 'none';
+        return props.theme.blockColors[props.blockType] || 'transparent';
     }};
 
     ${props =>
@@ -27,6 +29,30 @@ const Cell = styled.span`
         css`
             animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
         `};
+`;
+
+const GridOverlay = styled.div`
+    width: 100%;
+    height: 100%;
+    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'white')};
+    z-index: ${({ theme }) => theme.gridOverlayZIndex};
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const NewGameButton = styled.button`
+    background-color: #87a4b0;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 6px;
+`;
+
+const GameStateMenu = styled.div`
+    background-color: white;
+    padding: 20px;
 `;
 
 function Game() {
@@ -40,6 +66,10 @@ function Game() {
         moveCurrentBlock,
         dropBlock,
         gameSpeed,
+        gameState,
+        setGameState,
+        togglePauseGame,
+        restartGame,
     } = store;
 
     const gameTick = React.useRef(null);
@@ -59,14 +89,15 @@ function Game() {
     storeRef.current = store;
 
     React.useEffect(() => {
-        gameTick.current = setInterval(() => {
-            storeRef.current.moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN);
-        }, gameSpeed);
-
+        if (gameState === GAME_STATES.PLAYING) {
+            gameTick.current = setInterval(() => {
+                storeRef.current.moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN);
+            }, gameSpeed);
+        }
         return () => {
             clearInterval(gameTick.current);
         };
-    }, [gameSpeed]);
+    }, [gameSpeed, gameState]);
 
     /**
      * Keyboard controls.
@@ -93,6 +124,12 @@ function Game() {
         Spacebar: {
             callback: () => dropBlock(), // spacebar for older browsers
         },
+        Escape: {
+            callback: () => togglePauseGame(),
+        },
+        Esc: {
+            callback: () => togglePauseGame(), // IE/Edge
+        },
     });
 
     let cells = [];
@@ -116,9 +153,35 @@ function Game() {
     }
 
     return (
-        <Grid height={grid.length} width={grid[0].length}>
-            {cells}
-        </Grid>
+        <div>
+            <Grid height={grid.length} width={grid[0].length}>
+                {gameState === GAME_STATES.NEW_GAME && (
+                    <GridOverlay>
+                        <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
+                            New Game
+                        </NewGameButton>
+                    </GridOverlay>
+                )}
+
+                {gameState === GAME_STATES.PAUSED && (
+                    <GridOverlay type="dark">
+                        <GameStateMenu>Paused</GameStateMenu>
+                    </GridOverlay>
+                )}
+
+                {gameState === GAME_STATES.GAME_OVER && (
+                    <GridOverlay type="dark">
+                        <GameStateMenu>
+                            <p>Game Over</p>
+                            <button onClick={restartGame}>Restart</button>
+                        </GameStateMenu>
+                    </GridOverlay>
+                )}
+
+                {cells}
+            </Grid>
+            <div onClick={togglePauseGame}>Pause</div>
+        </div>
     );
 }
 

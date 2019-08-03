@@ -11,6 +11,7 @@ const theme = {
         [BLOCK_TYPES.O]: '#F7DC6F',
         [BLOCK_TYPES.T]: '#9B59B6',
     },
+    gridOverlayZIndex: 2,
 };
 
 export default theme;
