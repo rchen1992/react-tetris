@@ -33,6 +33,13 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
     const callbackLoop = React.useRef(null);
 
     /**
+     * Keep track of which keys are current being held down.
+     * Prevents default key events from continually firing on
+     * holding key down.
+     */
+    const heldKeys = React.useRef(new Set());
+
+    /**
      * Create ref container for handlers, so that they
      * can be accessed in callback loop.
      */
@@ -40,7 +47,10 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
     handlersRef.current = handlers;
 
     function onKeyDown(e) {
-        const handler = handlers[e.key];
+        if (heldKeys.current.has(e.key)) return;
+        heldKeys.current.add(e.key);
+
+        const handler = handlersRef.current[e.key];
 
         if (!handler) return;
 
@@ -74,6 +84,7 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
             }
 
             handler.callback(e);
+
             runCallbackLoop();
         } else if (!handler.isActiveEvent) {
             handler.callback(e);
@@ -85,6 +96,8 @@ export default function useKeyboardListeners(handlers, activeEventInterval = 120
      * we should clear the active event and the callback loop.
      */
     function onKeyUp(e) {
+        heldKeys.current.delete(e.key);
+
         if (activeEvent.current === e.key) {
             activeEvent.current = null;
             clearTimeout(callbackLoop.current);

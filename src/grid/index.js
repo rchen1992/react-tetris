@@ -27,6 +27,20 @@ export function isWithinGridBounds(grid, coordinateSet) {
 }
 
 /**
+ * Returns true if coordinates are within the right edge of the grid.
+ *
+ * @param {array} grid - matrix
+ * @param {tuple} coordinates - [row,col] coordinates
+ * @param {array} blockShape - matrix
+ */
+export function isWithinGridRightEdge(grid, coordinates, blockShape) {
+    const coordinateSet = getBlockCellCoordinateSet(blockShape, coordinates);
+    return coordinateSet.keysArray().every(([row, col]) => {
+        return col < grid[0].length;
+    });
+}
+
+/**
  * Returns true if the given block's position does not collide
  * with another block on the grid.
  *

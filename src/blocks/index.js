@@ -8,12 +8,6 @@ export const BLOCK_TYPES = {
     T: 'T',
 };
 
-export const MOVEMENT_DIRECTIONS = {
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT',
-    DOWN: 'DOWN',
-};
-
 const blocks = {
     [BLOCK_TYPES.I]: {
         type: BLOCK_TYPES.I,

@@ -3,7 +3,7 @@ import { useStore } from 'store';
 import styled, { css } from 'styled-components';
 import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
-import { MOVEMENT_DIRECTIONS } from 'blocks';
+import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
 import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 
@@ -103,9 +103,7 @@ function Game() {
      * Keyboard controls.
      */
     useKeyboardListeners({
-        ArrowUp: {
-            callback: () => rotateCurrentBlock(),
-        },
+        ArrowUp: () => rotateCurrentBlock(),
         ArrowLeft: {
             isActiveEvent: true,
             callback: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.LEFT),
@@ -118,18 +116,10 @@ function Game() {
             isActiveEvent: true,
             callback: () => moveCurrentBlock(MOVEMENT_DIRECTIONS.DOWN),
         },
-        ' ': {
-            callback: () => dropBlock(), // spacebar
-        },
-        Spacebar: {
-            callback: () => dropBlock(), // spacebar for older browsers
-        },
-        Escape: {
-            callback: () => togglePauseGame(),
-        },
-        Esc: {
-            callback: () => togglePauseGame(), // IE/Edge
-        },
+        ' ': () => dropBlock(), // spacebar
+        Spacebar: () => dropBlock(), // spacebar for older browsers
+        Escape: () => togglePauseGame(),
+        Esc: () => togglePauseGame(), // IE/Edge
     });
 
     let cells = [];

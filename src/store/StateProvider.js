@@ -2,7 +2,8 @@ import React from 'react';
 import StateContext from './StateContext';
 import defaultState, { STARTING_BLOCK_COORDINATES, generateStartingBlock } from './defaultState';
 import rotateBlock from 'blocks/rotation';
-import { MOVEMENT_DIRECTIONS, getRandomNewBlock } from 'blocks';
+import { getRandomNewBlock } from 'blocks';
+import { MOVEMENT_DIRECTIONS, getCoordinatesAfterMove } from 'blocks/movement';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
 import {
     isValidBlockMove,
@@ -10,6 +11,7 @@ import {
     cloneGrid,
     clearFilledRows,
     isWithinGridBounds,
+    isWithinGridRightEdge,
 } from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
@@ -28,7 +30,20 @@ function StateProvider(props) {
         const { positionCoordinates, properties } = currentBlock;
         const rotatedBlockShape = rotateBlock(properties.shape);
 
-        if (isValidBlockMove(grid, positionCoordinates, rotatedBlockShape)) {
+        /**
+         * Because a block's position coordinates point to the top-left
+         * cell of its current shape, a rotation that places the block
+         * past the right edge of the grid will be rejected.
+         *
+         * So here we first shift the rotated block back into bounds
+         * before checking if the move is valid.
+         */
+        let shiftedCoordinates = positionCoordinates;
+        while (!isWithinGridRightEdge(grid, shiftedCoordinates, rotatedBlockShape)) {
+            shiftedCoordinates[1] -= 1;
+        }
+
+        if (isValidBlockMove(grid, shiftedCoordinates, rotatedBlockShape)) {
             setCurrentBlock(prevBlock => ({
                 ...prevBlock,
                 properties: {
@@ -42,23 +57,7 @@ function StateProvider(props) {
     function moveCurrentBlock(direction) {
         if (!canPerformAction()) return;
 
-        const [row, col] = currentBlock.positionCoordinates;
-
-        let newCoords;
-        switch (direction) {
-            case MOVEMENT_DIRECTIONS.LEFT:
-                newCoords = [row, col - 1];
-                break;
-            case MOVEMENT_DIRECTIONS.RIGHT:
-                newCoords = [row, col + 1];
-                break;
-            case MOVEMENT_DIRECTIONS.DOWN:
-                newCoords = [row + 1, col];
-                break;
-            default:
-                // No movement
-                newCoords = [row, col];
-        }
+        const newCoords = getCoordinatesAfterMove(direction, currentBlock.positionCoordinates);
 
         if (isValidBlockMove(grid, newCoords, currentBlock.properties.shape)) {
             setCurrentBlock(prevBlock => ({
