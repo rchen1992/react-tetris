@@ -1,4 +1,5 @@
 import { getRandomNewBlock } from 'blocks';
+import { createNextBlockQueue } from 'blocks/blockQueue';
 import { createGrid } from 'grid';
 import GAME_STATES from 'constants/gameStates';
 import GAME_SPEEDS from 'constants/gameSpeeds';
@@ -18,6 +19,7 @@ export function generateStartingBlock() {
 export default {
     grid: createGrid(GRID_HEIGHT, GRID_WIDTH),
     currentBlock: generateStartingBlock(),
+    nextBlockQueue: createNextBlockQueue(),
     gameSpeed: GAME_SPEEDS.STARTING,
     gameState: GAME_STATES.NEW_GAME,
 };

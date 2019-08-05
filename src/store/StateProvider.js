@@ -2,6 +2,7 @@ import React from 'react';
 import StateContext from './StateContext';
 import defaultState, { STARTING_BLOCK_COORDINATES, generateStartingBlock } from './defaultState';
 import rotateBlock from 'blocks/rotation';
+import { createNextBlockQueue } from 'blocks/blockQueue';
 import { getRandomNewBlock } from 'blocks';
 import { MOVEMENT_DIRECTIONS, getCoordinatesAfterMove } from 'blocks/movement';
 import getBlockCellCoordinateSet, { getNewCellCoordinateSet } from 'blocks/cellCoordinateSet';
@@ -19,6 +20,7 @@ import GAME_STATES from 'constants/gameStates';
 function StateProvider(props) {
     const [grid, setGrid] = React.useState(defaultState.grid);
     const [currentBlock, setCurrentBlock] = React.useState(defaultState.currentBlock);
+    const [nextBlockQueue, setNextBlockQueue] = React.useState(defaultState.nextBlockQueue);
     const [animatedRows, setAnimatedRows] = React.useState([]);
     const [gameSpeed, setGameSpeed] = React.useState(defaultState.gameSpeed);
     const [gameState, setGameState] = React.useState(defaultState.gameState);
@@ -118,7 +120,7 @@ function StateProvider(props) {
      * Generate new block at the top of the grid.
      */
     function generateNewCurrentBlock(newGrid) {
-        const blockType = getRandomNewBlock();
+        const blockType = nextBlockQueue[0];
         const [row, col] = STARTING_BLOCK_COORDINATES;
         let newBlock;
         let coordinateSet;
@@ -151,6 +153,7 @@ function StateProvider(props) {
         } while (!hasNoBlockCollisions(newGrid, coordinateSet));
 
         setCurrentBlock(newBlock);
+        setNextBlockQueue(prev => [...prev.slice(1), getRandomNewBlock()]);
     }
 
     /**
@@ -257,6 +260,7 @@ function StateProvider(props) {
     function restartGame() {
         setGrid(defaultState.grid);
         setCurrentBlock(generateStartingBlock());
+        setNextBlockQueue(createNextBlockQueue());
         setGameSpeed(defaultState.gameSpeed);
         setAnimatedRows([]);
 
@@ -277,6 +281,7 @@ function StateProvider(props) {
         () => ({
             grid,
             currentBlock,
+            nextBlockQueue,
             animatedRows,
             currentBlockCellCoordinateSet: currentBlockCellCoordinateSet.current,
             rotateCurrentBlock,
@@ -288,7 +293,15 @@ function StateProvider(props) {
             togglePauseGame,
             restartGame,
         }),
-        [grid, currentBlock, animatedRows, currentBlockCellCoordinateSet, gameSpeed, gameState]
+        [
+            grid,
+            currentBlock,
+            nextBlockQueue,
+            animatedRows,
+            currentBlockCellCoordinateSet,
+            gameSpeed,
+            gameState,
+        ]
     );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;

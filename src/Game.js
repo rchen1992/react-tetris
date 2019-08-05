@@ -6,6 +6,7 @@ import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
 import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
+import NextBlock from './NextBlock';
 
 const Grid = styled.div`
     display: grid;
@@ -122,24 +123,27 @@ function Game() {
         Esc: () => togglePauseGame(), // IE/Edge
     });
 
-    let cells = [];
-    for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[i].length; j++) {
-            let blockType = grid[i][j];
-            if (!blockType && currentBlockCellCoordinateSet.has([i, j])) {
-                blockType = currentBlock.properties.type;
-            }
+    function renderGrid() {
+        let cells = [];
+        for (let i = 0; i < grid.length; i++) {
+            for (let j = 0; j < grid[i].length; j++) {
+                let blockType = grid[i][j];
+                if (!blockType && currentBlockCellCoordinateSet.has([i, j])) {
+                    blockType = currentBlock.properties.type;
+                }
 
-            cells.push(
-                <Cell
-                    key={`${i}${j}`}
-                    row={i}
-                    col={j}
-                    blockType={blockType}
-                    animatingClear={animatedRows.includes(i)}
-                />
-            );
+                cells.push(
+                    <Cell
+                        key={`${i}${j}`}
+                        row={i}
+                        col={j}
+                        blockType={blockType}
+                        animatingClear={animatedRows.includes(i)}
+                    />
+                );
+            }
         }
+        return cells;
     }
 
     return (
@@ -168,9 +172,10 @@ function Game() {
                     </GridOverlay>
                 )}
 
-                {cells}
+                {renderGrid()}
             </Grid>
             <div onClick={togglePauseGame}>Pause</div>
+            <NextBlock />
         </div>
     );
 }
