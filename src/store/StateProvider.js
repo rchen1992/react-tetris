@@ -13,6 +13,7 @@ import {
     clearFilledRows,
     isWithinGridBounds,
     isWithinGridRightEdge,
+    findLowestAvailableBlockPosition,
 } from 'grid';
 import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
@@ -25,6 +26,7 @@ function StateProvider(props) {
     const [gameSpeed, setGameSpeed] = React.useState(defaultState.gameSpeed);
     const [gameState, setGameState] = React.useState(defaultState.gameState);
     const currentBlockCellCoordinateSet = React.useRef(null);
+    const ghostBlockCellCoordinateSet = React.useRef(null);
 
     function rotateCurrentBlock() {
         if (!canPerformAction()) return;
@@ -162,23 +164,12 @@ function StateProvider(props) {
     function dropBlock() {
         if (!canPerformAction()) return;
 
-        /**
-         * Continually move block downwards and check if it is a valid move.
-         * As soon as it is invalid, we know the final location for the block
-         * should be just before the last move.
-         */
-        const [row, col] = currentBlock.positionCoordinates;
-        let rowMove = 1;
-        while (isValidBlockMove(grid, [row + rowMove, col], currentBlock.properties.shape)) {
-            rowMove += 1;
-        }
+        const newCoords = findLowestAvailableBlockPosition(
+            grid,
+            currentBlock.positionCoordinates,
+            currentBlock.properties.shape
+        );
 
-        /**
-         * Move block to new location.
-         * Note: we do `rowMove - 1` because we went past the last
-         * valid position for a block.
-         */
-        const newCoords = [row + rowMove - 1, col];
         setCurrentBlock(prevBlock => ({
             ...prevBlock,
             positionCoordinates: newCoords,
@@ -277,6 +268,24 @@ function StateProvider(props) {
         ? getBlockCellCoordinateSet(currentBlock.properties.shape, currentBlock.positionCoordinates)
         : getNewCellCoordinateSet();
 
+    /**
+     * Compute position of ghost block.
+     */
+    if (currentBlock) {
+        const ghostBlockCoordinates = findLowestAvailableBlockPosition(
+            grid,
+            currentBlock.positionCoordinates,
+            currentBlock.properties.shape
+        );
+
+        ghostBlockCellCoordinateSet.current = getBlockCellCoordinateSet(
+            currentBlock.properties.shape,
+            ghostBlockCoordinates
+        );
+    } else {
+        ghostBlockCellCoordinateSet.current = getNewCellCoordinateSet();
+    }
+
     const state = React.useMemo(
         () => ({
             grid,
@@ -284,6 +293,7 @@ function StateProvider(props) {
             nextBlockQueue,
             animatedRows,
             currentBlockCellCoordinateSet: currentBlockCellCoordinateSet.current,
+            ghostBlockCellCoordinateSet: ghostBlockCellCoordinateSet.current,
             rotateCurrentBlock,
             moveCurrentBlock,
             dropBlock,
@@ -293,15 +303,7 @@ function StateProvider(props) {
             togglePauseGame,
             restartGame,
         }),
-        [
-            grid,
-            currentBlock,
-            nextBlockQueue,
-            animatedRows,
-            currentBlockCellCoordinateSet,
-            gameSpeed,
-            gameState,
-        ]
+        [grid, currentBlock, nextBlockQueue, animatedRows, gameSpeed, gameState]
     );
 
     return <StateContext.Provider value={state}>{props.children}</StateContext.Provider>;

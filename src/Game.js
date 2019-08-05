@@ -24,6 +24,7 @@ const Cell = styled.span`
     background-color: ${props => {
         return props.theme.blockColors[props.blockType] || 'transparent';
     }};
+    opacity: ${props => (props.isGhostBlock ? 0.5 : 1)};
 
     ${props =>
         props.animatingClear &&
@@ -63,6 +64,7 @@ function Game() {
         currentBlock,
         animatedRows,
         currentBlockCellCoordinateSet,
+        ghostBlockCellCoordinateSet,
         rotateCurrentBlock,
         moveCurrentBlock,
         dropBlock,
@@ -128,7 +130,10 @@ function Game() {
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid[i].length; j++) {
                 let blockType = grid[i][j];
-                if (!blockType && currentBlockCellCoordinateSet.has([i, j])) {
+                const isGhostBlock = ghostBlockCellCoordinateSet.has([i, j]);
+                const isCurrentBlock = currentBlockCellCoordinateSet.has([i, j]);
+
+                if (!blockType && (isCurrentBlock || isGhostBlock)) {
                     blockType = currentBlock.properties.type;
                 }
 
@@ -138,6 +143,7 @@ function Game() {
                         row={i}
                         col={j}
                         blockType={blockType}
+                        isGhostBlock={isGhostBlock && !isCurrentBlock}
                         animatingClear={animatedRows.includes(i)}
                     />
                 );

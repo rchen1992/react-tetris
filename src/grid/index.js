@@ -95,3 +95,33 @@ export function clearFilledRows(grid) {
         return grid;
     }
 }
+
+/**
+ * Returns the coordinates for the lowest possible
+ * position on the grid that a block can be in,
+ * given its current position and shape.
+ *
+ * Useful for dropping a block instantly or finding the ghost block.
+ *
+ * @param {array} grid - matrix
+ * @param {tuple} coordinates
+ * @param {array} blockShape - matrix
+ */
+export function findLowestAvailableBlockPosition(grid, coordinates, blockShape) {
+    /**
+     * Continually move block downwards and check if it is a valid move.
+     * As soon as it is invalid, we know the final location for the block
+     * should be just before the last move.
+     */
+    const [row, col] = coordinates;
+    let rowMove = 1;
+    while (isValidBlockMove(grid, [row + rowMove, col], blockShape)) {
+        rowMove += 1;
+    }
+
+    /**
+     * New coordinates are at `rowMove - 1`
+     * because we went past the last valid position for a block.
+     */
+    return [row + rowMove - 1, col];
+}

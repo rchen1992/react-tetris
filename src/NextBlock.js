@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from 'store';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { math } from 'polished';
 
 const Grid = styled.div`
