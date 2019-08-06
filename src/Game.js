@@ -19,8 +19,16 @@ const Grid = styled.div`
     position: relative;
 `;
 
-const Cell = styled.span`
-    border: 1px solid black;
+const GridCell = styled.span`
+    border: 1px solid ${({ theme }) => theme.gridLineColor};
+    background-color: ${props => {
+        return props.theme.gridBackgroundColor;
+    }};
+`;
+
+const InnerCell = styled.div`
+    height: 100%;
+    width: 100%;
     background-color: ${props => {
         return props.theme.blockColors[props.blockType] || 'transparent';
     }};
@@ -30,6 +38,7 @@ const Cell = styled.span`
         props.animatingClear &&
         css`
             animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
+            animation-fill-mode: forwards;
         `};
 `;
 
@@ -138,14 +147,13 @@ function Game() {
                 }
 
                 cells.push(
-                    <Cell
-                        key={`${i}${j}`}
-                        row={i}
-                        col={j}
-                        blockType={blockType}
-                        isGhostBlock={isGhostBlock && !isCurrentBlock}
-                        animatingClear={animatedRows.includes(i)}
-                    />
+                    <GridCell key={`${i}${j}`}>
+                        <InnerCell
+                            blockType={blockType}
+                            isGhostBlock={isGhostBlock && !isCurrentBlock}
+                            animatingClear={animatedRows.includes(i)}
+                        />
+                    </GridCell>
                 );
             }
         }

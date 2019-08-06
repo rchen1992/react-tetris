@@ -2,6 +2,8 @@ import { BLOCK_TYPES } from 'blocks';
 
 const theme = {
     cellSize: '30px',
+    gridLineColor: '#273746',
+    gridBackgroundColor: '#2E4053',
     blockColors: {
         [BLOCK_TYPES.I]: '#5DADE2',
         [BLOCK_TYPES.L]: '#F39C12',
