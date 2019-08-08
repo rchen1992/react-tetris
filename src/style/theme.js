@@ -1,9 +1,22 @@
 import { BLOCK_TYPES } from 'blocks';
+import { css } from 'styled-components';
+
+/**
+ * https://uigradients.com/#EmeraldWater
+ */
+const pageBackgroundCss = css`
+    background: #348f50;
+    background: -webkit-linear-gradient(to right, #56b4d3, #348f50);
+    background: linear-gradient(to right, #56b4d3, #348f50);
+`;
 
 const theme = {
-    cellSize: '30px',
+    cellSize: '26px',
     gridLineColor: '#273746',
     gridBackgroundColor: '#2E4053',
+    gridCoatingColor: '#5D6D7E',
+    gridContainerBackgroundColor: '#243B4A',
+    pageBackgroundCss,
     blockColors: {
         [BLOCK_TYPES.I]: '#5DADE2',
         [BLOCK_TYPES.L]: '#F39C12',

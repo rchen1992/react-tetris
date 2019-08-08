@@ -8,14 +8,27 @@ import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animation
 import GAME_STATES from 'constants/gameStates';
 import NextBlock from './NextBlock';
 
+const GridContainer = styled.div`
+    display: inline-flex;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.gridContainerBackgroundColor};
+    padding: 40px;
+    border-radius: 10px;
+    margin: auto;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+`;
+
+const GridCoating = styled.div`
+    padding: 6px;
+    border-radius: 6px;
+    background-color: ${({ theme }) => theme.gridCoatingColor};
+`;
+
 const Grid = styled.div`
     display: grid;
     grid-template-columns: ${props => `repeat(${props.width}, ${props.theme.cellSize})`};
     grid-template-rows: ${props => `repeat(${props.height}, ${props.theme.cellSize})`};
     width: ${props => math(`${props.theme.cellSize} * ${props.width}`)};
-    border: 1px solid black;
-    margin: auto;
-    margin-top: 50px;
     position: relative;
 `;
 
@@ -161,36 +174,38 @@ function Game() {
     }
 
     return (
-        <div>
-            <Grid height={grid.length} width={grid[0].length}>
-                {gameState === GAME_STATES.NEW_GAME && (
-                    <GridOverlay>
-                        <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
-                            New Game
-                        </NewGameButton>
-                    </GridOverlay>
-                )}
+        <GridContainer>
+            <GridCoating>
+                <Grid height={grid.length} width={grid[0].length}>
+                    {gameState === GAME_STATES.NEW_GAME && (
+                        <GridOverlay>
+                            <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
+                                New Game
+                            </NewGameButton>
+                        </GridOverlay>
+                    )}
 
-                {gameState === GAME_STATES.PAUSED && (
-                    <GridOverlay type="dark">
-                        <GameStateMenu>Paused</GameStateMenu>
-                    </GridOverlay>
-                )}
+                    {gameState === GAME_STATES.PAUSED && (
+                        <GridOverlay type="dark">
+                            <GameStateMenu>Paused</GameStateMenu>
+                        </GridOverlay>
+                    )}
 
-                {gameState === GAME_STATES.GAME_OVER && (
-                    <GridOverlay type="dark">
-                        <GameStateMenu>
-                            <p>Game Over</p>
-                            <button onClick={restartGame}>Restart</button>
-                        </GameStateMenu>
-                    </GridOverlay>
-                )}
+                    {gameState === GAME_STATES.GAME_OVER && (
+                        <GridOverlay type="dark">
+                            <GameStateMenu>
+                                <p>Game Over</p>
+                                <button onClick={restartGame}>Restart</button>
+                            </GameStateMenu>
+                        </GridOverlay>
+                    )}
 
-                {renderGrid()}
-            </Grid>
+                    {renderGrid()}
+                </Grid>
+            </GridCoating>
             <div onClick={togglePauseGame}>Pause</div>
             <NextBlock />
-        </div>
+        </GridContainer>
     );
 }
 
