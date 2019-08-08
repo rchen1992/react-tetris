@@ -1,12 +1,12 @@
 import React from 'react';
 import { useStore } from 'store';
 import styled, { css } from 'styled-components';
-import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
 import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 import NextBlock from './NextBlock';
+import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
 
 const GridContainer = styled.div`
     display: inline-flex;
@@ -18,33 +18,7 @@ const GridContainer = styled.div`
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
 `;
 
-const GridCoating = styled.div`
-    padding: 6px;
-    border-radius: 6px;
-    background-color: ${({ theme }) => theme.gridCoatingColor};
-`;
-
-const Grid = styled.div`
-    display: grid;
-    grid-template-columns: ${props => `repeat(${props.width}, ${props.theme.cellSize})`};
-    grid-template-rows: ${props => `repeat(${props.height}, ${props.theme.cellSize})`};
-    width: ${props => math(`${props.theme.cellSize} * ${props.width}`)};
-    position: relative;
-`;
-
-const GridCell = styled.span`
-    border: 1px solid ${({ theme }) => theme.gridLineColor};
-    background-color: ${props => {
-        return props.theme.gridBackgroundColor;
-    }};
-`;
-
-const InnerCell = styled.div`
-    height: 100%;
-    width: 100%;
-    background-color: ${props => {
-        return props.theme.blockColors[props.blockType] || 'transparent';
-    }};
+const InnerCell = styled(InnerGridCell)`
     opacity: ${props => (props.isGhostBlock ? 0.5 : 1)};
 
     ${props =>
@@ -175,7 +149,7 @@ function Game() {
 
     return (
         <GridContainer>
-            <GridCoating>
+            <Coating>
                 <Grid height={grid.length} width={grid[0].length}>
                     {gameState === GAME_STATES.NEW_GAME && (
                         <GridOverlay>
@@ -202,7 +176,7 @@ function Game() {
 
                     {renderGrid()}
                 </Grid>
-            </GridCoating>
+            </Coating>
             <div onClick={togglePauseGame}>Pause</div>
             <NextBlock />
         </GridContainer>
