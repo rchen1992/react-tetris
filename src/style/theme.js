@@ -17,6 +17,7 @@ const theme = {
     gridCoatingColor: '#5D6D7E',
     gridContainerBackgroundColor: '#243B4A',
     pageBackgroundCss,
+    gameStateMenuColor: '#87a4b0',
     blockColors: {
         [BLOCK_TYPES.I]: '#5DADE2',
         [BLOCK_TYPES.L]: '#F39C12',

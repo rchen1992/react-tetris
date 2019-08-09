@@ -42,7 +42,7 @@ const GridOverlay = styled.div`
 `;
 
 const NewGameButton = styled.button`
-    background-color: #87a4b0;
+    background-color: ${({ theme }) => theme.gameStateMenuColor};
     border: none;
     padding: 14px 20px;
     color: white;
@@ -51,12 +51,12 @@ const NewGameButton = styled.button`
 
     :hover {
         cursor: pointer;
-        background-color: ${darken(0.1, '#87a4b0')};
+        background-color: ${({ theme }) => darken(0.1, theme.gameStateMenuColor)};
     }
 `;
 
 const GameStateMenu = styled.div`
-    background-color: #87a4b0;
+    background-color: ${({ theme }) => theme.gameStateMenuColor};
     color: white;
     padding: 16px;
     border-radius: 6px;
