@@ -3,6 +3,7 @@ import { useStore } from 'store';
 import styled from 'styled-components';
 import { math } from 'polished';
 import { Coating, Grid, GridCell, InnerGridCell } from './shared.styled';
+import GAME_STATES from 'constants/gameStates';
 
 const ContainerCoating = styled(Coating)`
     align-self: flex-start;
@@ -22,6 +23,7 @@ const GridWrapper = styled.div`
     justify-content: center;
     align-items: center;
     height: ${props => math(`${props.theme.cellSize} * 2`)};
+    visibility: ${props => (props.shouldShow ? 'visible' : 'hidden')};
 `;
 
 const Next = styled.div`
@@ -37,7 +39,7 @@ const OuterCell = styled(GridCell)`
 `;
 
 function NextBlock() {
-    const { nextBlockQueue } = useStore();
+    const { nextBlockQueue, gameState } = useStore();
     const { shape, type } = nextBlockQueue[0];
 
     let cells = [];
@@ -56,7 +58,7 @@ function NextBlock() {
         <ContainerCoating>
             <Container>
                 <Next>Next</Next>
-                <GridWrapper>
+                <GridWrapper shouldShow={gameState !== GAME_STATES.NEW_GAME}>
                     <Grid height={shape.length} width={shape[0].length}>
                         {cells}
                     </Grid>

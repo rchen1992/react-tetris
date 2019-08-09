@@ -355,3 +355,7 @@ template {
     font-family: 'Comfortaa';
     font-size: 14px;
 }
+
+button:focus {
+    outline: none;
+}

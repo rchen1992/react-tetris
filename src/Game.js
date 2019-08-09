@@ -7,6 +7,7 @@ import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animation
 import GAME_STATES from 'constants/gameStates';
 import NextBlock from './NextBlock';
 import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
+import { darken } from 'polished';
 
 const GridContainer = styled.div`
     display: inline-flex;
@@ -32,7 +33,7 @@ const InnerCell = styled(InnerGridCell)`
 const GridOverlay = styled.div`
     width: 100%;
     height: 100%;
-    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'white')};
+    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'transparent')};
     z-index: ${({ theme }) => theme.gridOverlayZIndex};
     position: absolute;
     display: flex;
@@ -43,14 +44,22 @@ const GridOverlay = styled.div`
 const NewGameButton = styled.button`
     background-color: #87a4b0;
     border: none;
-    padding: 10px 20px;
+    padding: 14px 20px;
     color: white;
     border-radius: 6px;
+    transition: background-color 200ms;
+
+    :hover {
+        cursor: pointer;
+        background-color: ${darken(0.1, '#87a4b0')};
+    }
 `;
 
 const GameStateMenu = styled.div`
-    background-color: white;
-    padding: 20px;
+    background-color: #87a4b0;
+    color: white;
+    padding: 16px;
+    border-radius: 6px;
 `;
 
 function Game() {
@@ -126,8 +135,10 @@ function Game() {
         for (let i = 0; i < grid.length; i++) {
             for (let j = 0; j < grid[i].length; j++) {
                 let blockType = grid[i][j];
-                const isGhostBlock = ghostBlockCellCoordinateSet.has([i, j]);
-                const isCurrentBlock = currentBlockCellCoordinateSet.has([i, j]);
+                const isGhostBlock =
+                    gameState !== GAME_STATES.NEW_GAME && ghostBlockCellCoordinateSet.has([i, j]);
+                const isCurrentBlock =
+                    gameState !== GAME_STATES.NEW_GAME && currentBlockCellCoordinateSet.has([i, j]);
 
                 if (!blockType && (isCurrentBlock || isGhostBlock)) {
                     blockType = currentBlock.properties.type;
@@ -167,10 +178,7 @@ function Game() {
 
                     {gameState === GAME_STATES.GAME_OVER && (
                         <GridOverlay type="dark">
-                            <GameStateMenu>
-                                <p>Game Over</p>
-                                <button onClick={restartGame}>Restart</button>
-                            </GameStateMenu>
+                            <GameStateMenu>Game Over</GameStateMenu>
                         </GridOverlay>
                     )}
 
