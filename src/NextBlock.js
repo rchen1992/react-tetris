@@ -6,18 +6,29 @@ import { Coating, Grid, GridCell, InnerGridCell } from './shared.styled';
 
 const ContainerCoating = styled(Coating)`
     align-self: flex-start;
+    padding: 4px;
 `;
 
 const Container = styled.div`
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
     width: ${props => math(`${props.theme.cellSize} * 4`)};
-    height: ${props => math(`${props.theme.cellSize} * 2`)};
     background-color: ${({ theme }) => theme.gridBackgroundColor};
-    padding: 16px 10px;
+    padding: 10px;
     box-sizing: content-box;
     border-radius: 6px;
+`;
+
+const GridWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: ${props => math(`${props.theme.cellSize} * 2`)};
+`;
+
+const Next = styled.div`
+    color: white;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-align: center;
 `;
 
 const OuterCell = styled(GridCell)`
@@ -44,9 +55,12 @@ function NextBlock() {
     return (
         <ContainerCoating>
             <Container>
-                <Grid height={shape.length} width={shape[0].length}>
-                    {cells}
-                </Grid>
+                <Next>Next</Next>
+                <GridWrapper>
+                    <Grid height={shape.length} width={shape[0].length}>
+                        {cells}
+                    </Grid>
+                </GridWrapper>
             </Container>
         </ContainerCoating>
     );
