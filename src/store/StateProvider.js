@@ -306,6 +306,7 @@ function StateProvider(props) {
             setGameState,
             togglePauseGame,
             restartGame,
+            randomizeTheme: props.randomizeTheme,
         }),
         [grid, currentBlock, nextBlockQueue, animatedRows, gameSpeed, gameState]
     );

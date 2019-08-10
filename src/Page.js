@@ -1,6 +1,7 @@
 import React from 'react';
 import Game from './Game';
 import styled from 'styled-components';
+import { useStore } from 'store';
 
 const StyledPage = styled.div`
     min-height: 100vh;
@@ -46,11 +47,13 @@ const RandomizeButton = styled.div`
 `;
 
 function Page() {
+    const { randomizeTheme } = useStore();
+
     return (
         <StyledPage>
             <Header>
                 <Title>React Tetris</Title>
-                <RandomizeButton>Randomize Theme</RandomizeButton>
+                <RandomizeButton onClick={randomizeTheme}>Randomize Theme</RandomizeButton>
             </Header>
             <GameArea>
                 <Game />

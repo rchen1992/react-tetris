@@ -3,19 +3,18 @@ import { css } from 'styled-components';
 import { darken } from 'polished';
 
 /**
- * https://uigradients.com/#EmeraldWater
+ * https://uigradients.com/#Hazel
  */
 const pageBackgroundCss = css`
-    background: #348f50;
-    background: -webkit-linear-gradient(to right, #56b4d3, #348f50);
-    background: linear-gradient(to right, #56b4d3, #348f50);
+    background: #77a1d3;
+    background: -webkit-linear-gradient(to right, #e684ae, #79cbca, #77a1d3);
+    background: linear-gradient(to right, #e684ae, #79cbca, #77a1d3);
 `;
 
 const gameStateMenuColor = '#87a4b0';
 const gridCoatingColor = '#5D6D7E';
 
-const theme = {
-    cellSize: '26px',
+const palette = {
     gridLineColor: '#273746',
     gridBackgroundColor: '#2E4053',
     gridCoatingColor,
@@ -33,7 +32,6 @@ const theme = {
         [BLOCK_TYPES.O]: '#F7DC6F',
         [BLOCK_TYPES.T]: '#9B59B6',
     },
-    gridOverlayZIndex: 2,
 };
 
-export default theme;
+export default palette;
