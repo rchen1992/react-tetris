@@ -1,5 +1,6 @@
 import { BLOCK_TYPES } from 'blocks';
 import { css } from 'styled-components';
+import { darken } from 'polished';
 
 /**
  * https://uigradients.com/#EmeraldWater
@@ -10,14 +11,19 @@ const pageBackgroundCss = css`
     background: linear-gradient(to right, #56b4d3, #348f50);
 `;
 
+const gameStateMenuColor = '#87a4b0';
+const gridCoatingColor = '#5D6D7E';
+
 const theme = {
     cellSize: '26px',
     gridLineColor: '#273746',
     gridBackgroundColor: '#2E4053',
-    gridCoatingColor: '#5D6D7E',
+    gridCoatingColor,
+    gridCoatingColorDarken: darken(0.1, gridCoatingColor),
     gridContainerBackgroundColor: '#243B4A',
     pageBackgroundCss,
-    gameStateMenuColor: '#87a4b0',
+    gameStateMenuColor,
+    gameStateMenuColorHover: darken(0.1, gameStateMenuColor),
     blockColors: {
         [BLOCK_TYPES.I]: '#5DADE2',
         [BLOCK_TYPES.L]: '#F39C12',

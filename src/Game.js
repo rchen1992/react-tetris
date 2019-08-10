@@ -5,9 +5,8 @@ import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
 import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
-import NextBlock from './NextBlock';
 import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
-import { darken } from 'polished';
+import SideColumn from './SideColumn';
 
 const GridContainer = styled.div`
     display: inline-flex;
@@ -51,7 +50,7 @@ const NewGameButton = styled.button`
 
     :hover {
         cursor: pointer;
-        background-color: ${({ theme }) => darken(0.1, theme.gameStateMenuColor)};
+        background-color: ${({ theme }) => theme.gameStateMenuColorHover};
     }
 `;
 
@@ -77,7 +76,6 @@ function Game() {
         gameState,
         setGameState,
         togglePauseGame,
-        restartGame,
     } = store;
 
     const gameTick = React.useRef(null);
@@ -185,8 +183,7 @@ function Game() {
                     {renderGrid()}
                 </Grid>
             </Coating>
-            <div onClick={togglePauseGame}>Pause</div>
-            <NextBlock />
+            <SideColumn />
         </GridContainer>
     );
 }
