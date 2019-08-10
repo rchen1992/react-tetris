@@ -15,7 +15,11 @@ import {
     isWithinGridRightEdge,
     findLowestAvailableBlockPosition,
 } from 'grid';
-import { CLEAR_ROW_ANIMATION_DURATION } from 'style/animations';
+import {
+    CLEAR_ROW_ANIMATION_DURATION,
+    COLLAPSE_ROW_ANIMATION_DURATION,
+    ROW_ANIMATION_DURATION_OVERLAP,
+} from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 
 function StateProvider(props) {
@@ -213,7 +217,7 @@ function StateProvider(props) {
                     setGrid(clearFilledRows(grid));
 
                     resolve();
-                }, CLEAR_ROW_ANIMATION_DURATION);
+                }, CLEAR_ROW_ANIMATION_DURATION + COLLAPSE_ROW_ANIMATION_DURATION - ROW_ANIMATION_DURATION_OVERLAP);
             } else {
                 resolve();
             }

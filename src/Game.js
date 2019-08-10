@@ -3,7 +3,13 @@ import { useStore } from 'store';
 import styled, { css } from 'styled-components';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
-import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
+import {
+    CLEAR_ROW_ANIMATION_DURATION,
+    COLLAPSE_ROW_ANIMATION_DURATION,
+    ROW_ANIMATION_DURATION_OVERLAP,
+    clearRowAnimation,
+    collapseRowAnimation,
+} from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
 import SideColumn from './SideColumn';
@@ -25,6 +31,14 @@ const InnerCell = styled(InnerGridCell)`
         props.animatingClear &&
         css`
             animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
+            animation-fill-mode: forwards;
+        `};
+
+    ${props =>
+        !!props.animatingCollapseRows &&
+        css`
+            animation: ${collapseRowAnimation(props)} ${COLLAPSE_ROW_ANIMATION_DURATION}ms;
+            animation-delay: ${CLEAR_ROW_ANIMATION_DURATION - ROW_ANIMATION_DURATION_OVERLAP}ms;
             animation-fill-mode: forwards;
         `};
 `;
@@ -131,6 +145,23 @@ function Game() {
     function renderGrid() {
         let cells = [];
         for (let i = 0; i < grid.length; i++) {
+            /**
+             * Should the current row run a line clear animation?
+             */
+            const animatingClear = animatedRows.includes(i);
+
+            /**
+             * How many lines should this row collapse
+             * if we are running a line clear animation?
+             *
+             * Determined by checking how many rows were
+             * cleared below this current row.
+             */
+            const animatingCollapseRows =
+                animatedRows.length === 0 || animatedRows.includes(i)
+                    ? null
+                    : animatedRows.filter(row => row > i).length;
+
             for (let j = 0; j < grid[i].length; j++) {
                 let blockType = grid[i][j];
                 const isGhostBlock =
@@ -147,7 +178,8 @@ function Game() {
                         <InnerCell
                             blockType={blockType}
                             isGhostBlock={isGhostBlock && !isCurrentBlock}
-                            animatingClear={animatedRows.includes(i)}
+                            animatingClear={animatingClear}
+                            animatingCollapseRows={animatingCollapseRows}
                         />
                     </GridCell>
                 );
