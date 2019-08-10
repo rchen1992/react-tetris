@@ -60,11 +60,12 @@ const NewGameButton = styled.button`
     padding: 14px 20px;
     color: white;
     border-radius: 6px;
-    transition: background-color 200ms;
+    transition: background-color 200ms, transform 200ms;
 
     :hover {
         cursor: pointer;
         background-color: ${({ theme }) => theme.gameStateMenuColorHover};
+        transform: translateY(-2px);
     }
 `;
 
