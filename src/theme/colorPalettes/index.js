@@ -7,6 +7,6 @@ export const COLOR_PALETTE_KEYS = {
 };
 
 export default {
-    EMERALD_WATER: EmeraldWater,
-    HAZEL: Hazel,
+    [COLOR_PALETTE_KEYS.EMERALD_WATER]: EmeraldWater,
+    [COLOR_PALETTE_KEYS.HAZEL]: Hazel,
 };

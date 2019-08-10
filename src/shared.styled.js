@@ -28,4 +28,10 @@ export const InnerGridCell = styled.div`
     background-color: ${props => {
         return props.theme.blockColors[props.blockType] || 'transparent';
     }};
+    border: ${props =>
+        props.blockType && props.theme.borderWidth
+            ? `${props.theme.borderWidth}px ${props.theme.borderType} ${
+                  props.theme.blockColors[props.blockType]
+              }`
+            : 'none'};
 `;
