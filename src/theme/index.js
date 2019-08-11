@@ -29,7 +29,7 @@ export function getRandomTheme() {
 
 export function getDefaultTheme() {
     return getTheme(
-        COLOR_PALETTE_KEYS.EMERALD_WATER,
+        COLOR_PALETTE_KEYS.WIRETAP,
         BLOCK_BORDER_KEYS.OUTSET,
         BLOCK_BORDER_RADIUS_KEYS.STANDARD
     );
