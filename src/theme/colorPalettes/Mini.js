@@ -24,13 +24,13 @@ const palette = {
     gameStateMenuColor,
     gameStateMenuColorHover: darken(0.1, gameStateMenuColor),
     blockColors: {
-        [BLOCK_TYPES.I]: '#5DADE2',
-        [BLOCK_TYPES.L]: '#F39C12',
-        [BLOCK_TYPES.J]: '#2471A3',
-        [BLOCK_TYPES.S]: '#52BE80',
-        [BLOCK_TYPES.Z]: '#E74C3C',
-        [BLOCK_TYPES.O]: '#F7DC6F',
-        [BLOCK_TYPES.T]: '#9B59B6',
+        [BLOCK_TYPES.I]: '#EDFF86',
+        [BLOCK_TYPES.L]: '#B2E6D4',
+        [BLOCK_TYPES.J]: '#E952DE',
+        [BLOCK_TYPES.S]: '#EA526F',
+        [BLOCK_TYPES.Z]: '#5C7AFF',
+        [BLOCK_TYPES.O]: '#EFEA5A',
+        [BLOCK_TYPES.T]: '#23B5D3',
     },
 };
 
