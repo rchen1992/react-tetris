@@ -3,7 +3,7 @@ import { css } from 'styled-components';
 import { darken } from 'polished';
 
 /**
- * https://uigradients.com/#EmeraldWater
+ * https://uigradients.com/#Mini
  */
 const pageBackgroundCss = css`
     background: #30e8bf;
