@@ -9,7 +9,7 @@ import 'style/index.css';
 
 function App() {
     const [theme, setTheme] = React.useState(
-        getTheme(COLOR_PALETTE_KEYS.EMERALD_WATER, BLOCK_STYLE_KEYS.STANDARD)
+        getTheme(COLOR_PALETTE_KEYS.EMERALD_WATER, BLOCK_STYLE_KEYS.OUTSET)
     );
 
     function randomizeTheme() {

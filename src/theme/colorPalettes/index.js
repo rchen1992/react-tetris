@@ -1,12 +1,12 @@
 import EmeraldWater from './EmeraldWater';
-import Hazel from './Hazel';
+import Anamnisar from './Anamnisar';
 
 export const COLOR_PALETTE_KEYS = {
     EMERALD_WATER: 'EMERALD_WATER',
-    HAZEL: 'HAZEL',
+    ANAMNISAR: 'ANAMNISAR',
 };
 
 export default {
     [COLOR_PALETTE_KEYS.EMERALD_WATER]: EmeraldWater,
-    [COLOR_PALETTE_KEYS.HAZEL]: Hazel,
+    [COLOR_PALETTE_KEYS.ANAMNISAR]: Anamnisar,
 };
