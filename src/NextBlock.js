@@ -36,6 +36,7 @@ const Next = styled.div`
 const OuterCell = styled(GridCell)`
     border: ${props =>
         props.blockType === null ? 'none' : `1px solid ${props.theme.gridLineColor}`};
+    border-radius: ${({ theme }) => theme.blockStyles.borderRadius || 'initial'};
 `;
 
 function NextBlock() {

@@ -25,13 +25,15 @@ export const GridCell = styled.span`
 export const InnerGridCell = styled.div`
     height: 100%;
     width: 100%;
-    background-color: ${props => {
-        return props.theme.blockColors[props.blockType] || 'transparent';
+    background-color: ${({ theme, blockType }) => {
+        return theme.blockColors[blockType] || 'transparent';
     }};
-    border: ${props =>
-        props.blockType && props.theme.borderWidth
-            ? `${props.theme.borderWidth}px ${props.theme.borderType} ${
-                  props.theme.blockColors[props.blockType]
+    border: ${({ theme, blockType }) =>
+        blockType && theme.blockStyles.borderWidth
+            ? `${theme.blockStyles.borderWidth}px ${theme.blockStyles.borderType} ${
+                  theme.blockColors[blockType]
               }`
             : 'none'};
+
+    border-radius: ${({ theme }) => theme.blockStyles.borderRadius || 'initial'};
 `;
