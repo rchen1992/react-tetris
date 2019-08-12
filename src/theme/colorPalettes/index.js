@@ -4,6 +4,7 @@ import Wiretap from './Wiretap';
 import Mini from './Mini';
 import Coal from './Coal';
 import Peach from './Peach';
+import Timber from './Timber';
 
 export const COLOR_PALETTE_KEYS = {
     EMERALD_WATER: 'EMERALD_WATER',
@@ -12,6 +13,7 @@ export const COLOR_PALETTE_KEYS = {
     MINI: 'MINI',
     COAL: 'COAL',
     PEACH: 'PEACH',
+    TIMBER: 'TIMBER',
 };
 
 export default {
@@ -21,4 +23,5 @@ export default {
     [COLOR_PALETTE_KEYS.MINI]: Mini,
     [COLOR_PALETTE_KEYS.COAL]: Coal,
     [COLOR_PALETTE_KEYS.PEACH]: Peach,
+    [COLOR_PALETTE_KEYS.TIMBER]: Timber,
 };
