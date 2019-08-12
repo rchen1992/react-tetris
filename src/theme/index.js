@@ -29,7 +29,7 @@ export function getRandomTheme() {
 
 export function getDefaultTheme() {
     return getTheme(
-        COLOR_PALETTE_KEYS.TIMBER,
+        COLOR_PALETTE_KEYS.EASY_MED,
         BLOCK_BORDER_KEYS.OUTSET,
         BLOCK_BORDER_RADIUS_KEYS.STANDARD
     );

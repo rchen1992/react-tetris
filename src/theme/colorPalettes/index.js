@@ -5,6 +5,7 @@ import Mini from './Mini';
 import Coal from './Coal';
 import Peach from './Peach';
 import Timber from './Timber';
+import EasyMed from './EasyMed';
 
 export const COLOR_PALETTE_KEYS = {
     EMERALD_WATER: 'EMERALD_WATER',
@@ -14,6 +15,7 @@ export const COLOR_PALETTE_KEYS = {
     COAL: 'COAL',
     PEACH: 'PEACH',
     TIMBER: 'TIMBER',
+    EASY_MED: 'EASY_MED',
 };
 
 export default {
@@ -24,4 +26,5 @@ export default {
     [COLOR_PALETTE_KEYS.COAL]: Coal,
     [COLOR_PALETTE_KEYS.PEACH]: Peach,
     [COLOR_PALETTE_KEYS.TIMBER]: Timber,
+    [COLOR_PALETTE_KEYS.EASY_MED]: EasyMed,
 };
