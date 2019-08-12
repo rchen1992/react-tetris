@@ -1,42 +1,52 @@
 import React from 'react';
 import { useStore } from 'store';
 import styled, { css } from 'styled-components';
-import { math } from 'polished';
 import useKeyboardListeners from 'hooks/useKeyboardListeners';
 import { MOVEMENT_DIRECTIONS } from 'blocks/movement';
-import { CLEAR_ROW_ANIMATION_DURATION, clearRowAnimation } from 'style/animations';
+import {
+    CLEAR_ROW_ANIMATION_DURATION,
+    COLLAPSE_ROW_ANIMATION_DURATION,
+    ROW_ANIMATION_DURATION_OVERLAP,
+    clearRowAnimation,
+    collapseRowAnimation,
+} from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
-import NextBlock from './NextBlock';
+import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
+import SideColumn from './SideColumn';
 
-const Grid = styled.div`
-    display: grid;
-    grid-template-columns: ${props => `repeat(${props.width}, ${props.theme.cellSize})`};
-    grid-template-rows: ${props => `repeat(${props.height}, ${props.theme.cellSize})`};
-    width: ${props => math(`${props.theme.cellSize} * ${props.width}`)};
-    border: 1px solid black;
+const GridContainer = styled.div`
+    display: inline-flex;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.gridContainerBackgroundColor};
+    padding: 40px;
+    border-radius: 10px;
     margin: auto;
-    margin-top: 50px;
-    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
 `;
 
-const Cell = styled.span`
-    border: 1px solid black;
-    background-color: ${props => {
-        return props.theme.blockColors[props.blockType] || 'transparent';
-    }};
+const InnerCell = styled(InnerGridCell)`
     opacity: ${props => (props.isGhostBlock ? 0.5 : 1)};
 
     ${props =>
         props.animatingClear &&
         css`
             animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
+            animation-fill-mode: forwards;
+        `};
+
+    ${props =>
+        !!props.animatingCollapseRows &&
+        css`
+            animation: ${collapseRowAnimation(props)} ${COLLAPSE_ROW_ANIMATION_DURATION}ms;
+            animation-delay: ${CLEAR_ROW_ANIMATION_DURATION - ROW_ANIMATION_DURATION_OVERLAP}ms;
+            animation-fill-mode: forwards;
         `};
 `;
 
 const GridOverlay = styled.div`
     width: 100%;
     height: 100%;
-    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'white')};
+    background-color: ${props => (props.type === 'dark' ? 'hsla(0, 0%, 0%, 0.45)' : 'transparent')};
     z-index: ${({ theme }) => theme.gridOverlayZIndex};
     position: absolute;
     display: flex;
@@ -45,16 +55,25 @@ const GridOverlay = styled.div`
 `;
 
 const NewGameButton = styled.button`
-    background-color: #87a4b0;
+    background-color: ${({ theme }) => theme.gameStateMenuColor};
     border: none;
-    padding: 10px 20px;
+    padding: 14px 20px;
     color: white;
     border-radius: 6px;
+    transition: background-color 200ms, transform 200ms;
+
+    :hover {
+        cursor: pointer;
+        background-color: ${({ theme }) => theme.gameStateMenuColorHover};
+        transform: translateY(-2px);
+    }
 `;
 
 const GameStateMenu = styled.div`
-    background-color: white;
-    padding: 20px;
+    background-color: ${({ theme }) => theme.gameStateMenuColor};
+    color: white;
+    padding: 16px;
+    border-radius: 6px;
 `;
 
 function Game() {
@@ -72,7 +91,6 @@ function Game() {
         gameState,
         setGameState,
         togglePauseGame,
-        restartGame,
     } = store;
 
     const gameTick = React.useRef(null);
@@ -128,24 +146,43 @@ function Game() {
     function renderGrid() {
         let cells = [];
         for (let i = 0; i < grid.length; i++) {
+            /**
+             * Should the current row run a line clear animation?
+             */
+            const animatingClear = animatedRows.includes(i);
+
+            /**
+             * How many lines should this row collapse
+             * if we are running a line clear animation?
+             *
+             * Determined by checking how many rows were
+             * cleared below this current row.
+             */
+            const animatingCollapseRows =
+                animatedRows.length === 0 || animatedRows.includes(i)
+                    ? null
+                    : animatedRows.filter(row => row > i).length;
+
             for (let j = 0; j < grid[i].length; j++) {
                 let blockType = grid[i][j];
-                const isGhostBlock = ghostBlockCellCoordinateSet.has([i, j]);
-                const isCurrentBlock = currentBlockCellCoordinateSet.has([i, j]);
+                const isGhostBlock =
+                    gameState !== GAME_STATES.NEW_GAME && ghostBlockCellCoordinateSet.has([i, j]);
+                const isCurrentBlock =
+                    gameState !== GAME_STATES.NEW_GAME && currentBlockCellCoordinateSet.has([i, j]);
 
                 if (!blockType && (isCurrentBlock || isGhostBlock)) {
                     blockType = currentBlock.properties.type;
                 }
 
                 cells.push(
-                    <Cell
-                        key={`${i}${j}`}
-                        row={i}
-                        col={j}
-                        blockType={blockType}
-                        isGhostBlock={isGhostBlock && !isCurrentBlock}
-                        animatingClear={animatedRows.includes(i)}
-                    />
+                    <GridCell key={`${i}${j}`}>
+                        <InnerCell
+                            blockType={blockType}
+                            isGhostBlock={isGhostBlock && !isCurrentBlock}
+                            animatingClear={animatingClear}
+                            animatingCollapseRows={animatingCollapseRows}
+                        />
+                    </GridCell>
                 );
             }
         }
@@ -153,36 +190,34 @@ function Game() {
     }
 
     return (
-        <div>
-            <Grid height={grid.length} width={grid[0].length}>
-                {gameState === GAME_STATES.NEW_GAME && (
-                    <GridOverlay>
-                        <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
-                            New Game
-                        </NewGameButton>
-                    </GridOverlay>
-                )}
+        <GridContainer>
+            <Coating>
+                <Grid height={grid.length} width={grid[0].length}>
+                    {gameState === GAME_STATES.NEW_GAME && (
+                        <GridOverlay>
+                            <NewGameButton onClick={() => setGameState(GAME_STATES.PLAYING)}>
+                                New Game
+                            </NewGameButton>
+                        </GridOverlay>
+                    )}
 
-                {gameState === GAME_STATES.PAUSED && (
-                    <GridOverlay type="dark">
-                        <GameStateMenu>Paused</GameStateMenu>
-                    </GridOverlay>
-                )}
+                    {gameState === GAME_STATES.PAUSED && (
+                        <GridOverlay type="dark">
+                            <GameStateMenu>Paused</GameStateMenu>
+                        </GridOverlay>
+                    )}
 
-                {gameState === GAME_STATES.GAME_OVER && (
-                    <GridOverlay type="dark">
-                        <GameStateMenu>
-                            <p>Game Over</p>
-                            <button onClick={restartGame}>Restart</button>
-                        </GameStateMenu>
-                    </GridOverlay>
-                )}
+                    {gameState === GAME_STATES.GAME_OVER && (
+                        <GridOverlay type="dark">
+                            <GameStateMenu>Game Over</GameStateMenu>
+                        </GridOverlay>
+                    )}
 
-                {renderGrid()}
-            </Grid>
-            <div onClick={togglePauseGame}>Pause</div>
-            <NextBlock />
-        </div>
+                    {renderGrid()}
+                </Grid>
+            </Coating>
+            <SideColumn />
+        </GridContainer>
     );
 }
 
