@@ -7,12 +7,14 @@ import {
     CLEAR_ROW_ANIMATION_DURATION,
     COLLAPSE_ROW_ANIMATION_DURATION,
     ROW_ANIMATION_DURATION_OVERLAP,
-    clearRowAnimation,
+    fadeOut,
     collapseRowAnimation,
+    gridContainerAnimation,
 } from 'style/animations';
 import GAME_STATES from 'constants/gameStates';
 import { Grid, Coating, GridCell, InnerGridCell } from './shared.styled';
 import SideColumn from './SideColumn';
+import { GRID_ANIMATION_DURATION, GRID_ANIMATION_DELAY } from 'style/animations';
 
 const GridContainer = styled.div`
     display: inline-flex;
@@ -22,6 +24,11 @@ const GridContainer = styled.div`
     border-radius: 10px;
     margin: auto;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    opacity: 0;
+
+    animation: ${gridContainerAnimation} ${GRID_ANIMATION_DURATION}ms;
+    animation-delay: ${GRID_ANIMATION_DELAY}ms;
+    animation-fill-mode: forwards;
 `;
 
 const InnerCell = styled(InnerGridCell)`
@@ -30,7 +37,7 @@ const InnerCell = styled(InnerGridCell)`
     ${props =>
         props.animatingClear &&
         css`
-            animation: ${clearRowAnimation} ${CLEAR_ROW_ANIMATION_DURATION}ms;
+            animation: ${fadeOut} ${CLEAR_ROW_ANIMATION_DURATION}ms;
             animation-fill-mode: forwards;
         `};
 

@@ -1,5 +1,5 @@
 const base = {
-    cellSize: '26px',
+    cellSize: '24px',
     gridOverlayZIndex: 2,
 };
 

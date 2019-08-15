@@ -2,6 +2,8 @@ import React from 'react';
 import Game from './Game';
 import styled from 'styled-components';
 import { useStore } from 'store';
+import Title from './Title';
+import { fadeOut, GRID_ANIMATION_DELAY } from 'style/animations';
 
 const StyledPage = styled.div`
     min-height: 100vh;
@@ -18,15 +20,11 @@ const GameArea = styled.div`
 
 const Header = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding: 20px;
     min-height: 10vh;
     color: white;
-`;
-
-const Title = styled.span`
-    font-size: 20px;
 `;
 
 const RandomizeButton = styled.div`
@@ -38,6 +36,12 @@ const RandomizeButton = styled.div`
     font-size: 12px;
     cursor: pointer;
     transition: all 200ms;
+    opacity: 0;
+
+    animation: ${fadeOut} 200ms;
+    animation-direction: reverse;
+    animation-fill-mode: forwards;
+    animation-delay: ${GRID_ANIMATION_DELAY}ms;
 
     :hover {
         color: #ccd1d1;
@@ -52,7 +56,7 @@ function Page() {
     return (
         <StyledPage>
             <Header>
-                <Title>React Tetris</Title>
+                <Title />
                 <RandomizeButton onClick={randomizeTheme}>Randomize Theme</RandomizeButton>
             </Header>
             <GameArea>
